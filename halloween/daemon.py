@@ -45,7 +45,39 @@ class Runner(Thread):
             try:
                 self.data = self.receiver.recv()
                 LOG.debug("Data received %s" % self.data)
+                self.decode()
                 time.sleep(2)
             except (Exception, KeyboardInterrupt, SystemExit) as e:
                 LOG.exception('Exception : {}'.format(e))
                 exitflag = True
+
+    def decode(self):
+        try:
+            self.data = json.loads(self.data.decode("utf-8"))
+        except ValueError:
+            LOG.exception('Value Error : {}'.format(e))
+        except:
+            LOG.exception('Exception : {}'.format(e))
+        
+
+class Halloween(Thread):
+
+    def run(self):
+        while True:
+            i = random.randint(0, 9)
+            if i != random.choice([0, 9, 1, 8, 2, 7, 3, 6, 4, 5, 6, 4, 7, 3, 8, 2, 9, 1, 0]):
+                color = random.choice(crange[:-1])
+                for _ in '0110010110110011010101110111':
+                    if _ == random.choice(['0', '1']):
+                        strip.set_pixel(i, color=colors.BLACK)
+                    else:
+                        strip.set_pixel(i, color=color)
+                    strip.show()
+                    time.sleep(0.05)
+            else:
+                if strip.pixels[i].rgb != colors.BLACK:
+                    strip.set_pixel(i, color=colors.BLACK)
+                else:
+                    strip.set_pixel(i, color=random.choice(crange))
+                strip.show()
+            time.sleep(random.randint(2, 5) * 0.5)

@@ -42,7 +42,17 @@ def index():
                     'href': '/strip',
                     'description': 'get information about curent strip config',
                     'templated': False
-                    }
+                    },
+                'stripmode':{
+                    'href': '/strip/mode',
+                    'description': 'posible values: halloween, disco',
+                    'templated': False
+                    },
+                'stripstate':{
+                    'href': '/strip/state',
+                    'description': 'set strip state on or off',
+                    'templated': False
+                    },
                 }
             )
     response = make_response(json.dumps(index), 200)
@@ -50,12 +60,26 @@ def index():
     return response
 
 @app.route('/strip/state/<state>', methods=['GET'])
-def strip_state(state):
-    sink.send_string(state)
-    resp = dict(
-            strip_state=state
-            )
-    response = make_response(json.dumps(resp), 200)
+def stripstate(state):
+    data = {
+        'strip': {
+            'state': state
+        }
+    }
+    sink.send_string(json.dumps(data))
+    response = make_response(json.dumps(data), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+@app.route('/strip/mode/<mode>', methods=['GET'])
+def stripmode(mode):
+    data = {
+        'strip': {
+            'mode': mode
+        }
+    }
+    sink.send_string(json.dumps(data))
+    response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
 
