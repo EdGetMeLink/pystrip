@@ -1,3 +1,6 @@
+import fcntl
+import array
+from halloween.colors import BLACK
 
 class Strip(object):
 
@@ -5,9 +8,9 @@ class Strip(object):
         '''
         initialize strip with length pixels and setup SPI interface
         '''
-        spidev = file(spi, "wb")
+        spidev = open(spi, "wb")
         #set the spi frequency to 400kbps
-        fcntl.ioctl(spidev, 0x40046b04, array.array('L', [400000]))
+        #fcntl.ioctl(spidev, 0x40046b04, array.array('L', [400000]))
         self.pixels = []
         for i in range(lenght):
             pixel = Pixel()

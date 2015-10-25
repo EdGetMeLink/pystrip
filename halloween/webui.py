@@ -87,7 +87,7 @@ def stripmode(mode):
 
 if __name__ == "__main__":
     setup_logging()
-    r = Runner(context)
+    r = Runner(context, 10)
     r.daemon = True
     print("Starting Daemon")
     r.start()

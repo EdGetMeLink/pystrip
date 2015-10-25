@@ -3,8 +3,10 @@ import logging.handlers
 import sys
 import time
 import zmq
+import json
 
-from threading import Thread
+from threading import Thread, Event
+from halloween.strip import Strip
 
 LOG = logging.getLogger(__name__)
 
@@ -29,11 +31,15 @@ def setup_logging():
 
 
 class Runner(Thread):
-    def __init__(self, context):
+    def __init__(self, context, strip_length):
         super(Runner, self).__init__()
         self.daemon = True
         self.name = "Main Runner"
         self.context = context
+        self.stop_event = Event()
+        self.strip_mode = 'Halloween'
+        self.strip_state = 'off'
+        self.strip = Strip(strip_length, spi='/tmp/teststrip.spi')
         LOG.debug("Initialized Daemon")
 
     def run(self):
@@ -46,7 +52,6 @@ class Runner(Thread):
                 self.data = self.receiver.recv()
                 LOG.debug("Data received %s" % self.data)
                 self.decode()
-                time.sleep(2)
             except (Exception, KeyboardInterrupt, SystemExit) as e:
                 LOG.exception('Exception : {}'.format(e))
                 exitflag = True
@@ -54,30 +59,46 @@ class Runner(Thread):
     def decode(self):
         try:
             self.data = json.loads(self.data.decode("utf-8"))
+            self.data = self.data['strip']
+            self.state = self.data.get('state', self.state)
+            self.mode = self.data.get('mode', self.mode)
+            if self.state == 'on':
+                self.stop_event.clear()
+                self.thread = self.mode(self.stop_event)
+                self.thread.start()
+            if self.state == 'off':
+                self.stop_event.set()
         except ValueError:
-            LOG.exception('Value Error : {}'.format(e))
+            LOG.exception('Value Error : {}'.format(self.data))
         except:
-            LOG.exception('Exception : {}'.format(e))
+            LOG.exception('Exception : ')
         
 
 class Halloween(Thread):
 
+    def __init__(self, strip, stop_event):
+        super(Halloween, self).__init__()
+        self.daemon = True
+        self.stop = stop_event
+        self.strip = strip
+
     def run(self):
-        while True:
+        while not self.stop.is_set():
             i = random.randint(0, 9)
             if i != random.choice([0, 9, 1, 8, 2, 7, 3, 6, 4, 5, 6, 4, 7, 3, 8, 2, 9, 1, 0]):
                 color = random.choice(crange[:-1])
                 for _ in '0110010110110011010101110111':
                     if _ == random.choice(['0', '1']):
-                        strip.set_pixel(i, color=colors.BLACK)
+                        self.strip.set_pixel(i, color=colors.BLACK)
                     else:
-                        strip.set_pixel(i, color=color)
-                    strip.show()
+                        self.strip.set_pixel(i, color=color)
+                    self.strip.show()
                     time.sleep(0.05)
             else:
-                if strip.pixels[i].rgb != colors.BLACK:
-                    strip.set_pixel(i, color=colors.BLACK)
+                if self.strip.pixels[i].rgb != colors.BLACK:
+                    self.strip.set_pixel(i, color=colors.BLACK)
                 else:
-                    strip.set_pixel(i, color=random.choice(crange))
-                strip.show()
+                    self.strip.set_pixel(i, color=random.choice(crange))
+                self.strip.show()
             time.sleep(random.randint(2, 5) * 0.5)
+        self.strip.all_off()
