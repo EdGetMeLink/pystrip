@@ -10,7 +10,7 @@ class Strip(object):
         '''
         self.spidev = open(spi, "wb")
         #set the spi frequency to 400kbps
-        #fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [400000]))
+        #fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [800000]))
         self.length = length
         self.pixels = []
         for i in range(length):
@@ -56,9 +56,9 @@ class Pixel(object):
         self.rgb = bytearray(3)
 
     def latch(self):
-        self.rgb(0) = self.red
-        self.rgb(1) = self.green
-        self.rgb(2) = self.blue
+        self.rgb[0] = self.red
+        self.rgb[1] = self.green
+        self.rgb[2] = self.blue
 
     def set_color(self, color):
         self.rgb = color

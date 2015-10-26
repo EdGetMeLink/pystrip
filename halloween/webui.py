@@ -1,6 +1,6 @@
 from flask import Flask, make_response, request
 import json
-import zmq
+from queue import Queue
 import logging
 import logging.handlers
 from halloween.daemon import Runner
@@ -8,11 +8,8 @@ from halloween.daemon import Runner
 LOG = logging.getLogger(__name__)
 SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
 app = Flask(__name__)
-context = zmq.Context()
-# Socket with direct access to the sink: used to syncronize start of batch
-sink = context.socket(zmq.PUSH)
-sink.connect("tcp://localhost:5558")
 
+queue = Queue()
 
 def setup_logging():
     LOG_FILE = "halloween.log"
@@ -66,7 +63,7 @@ def stripstate(state):
             'state': state
         }
     }
-    sink.send_string(json.dumps(data))
+    queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
@@ -78,7 +75,7 @@ def stripmode(mode):
             'mode': mode
         }
     }
-    sink.send_string(json.dumps(data))
+    queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
@@ -87,8 +84,7 @@ def stripmode(mode):
 
 if __name__ == "__main__":
     setup_logging()
-    r = Runner(context, 10)
-    r.daemon = True
+    r = Runner(queue, 10)
     print("Starting Daemon")
     r.start()
     app.run(host='0.0.0.0', port=8080, debug=True)
