@@ -4,15 +4,16 @@ from halloween.colors import BLACK
 
 class Strip(object):
 
-    def __init__(self, lenght, spi='/dev/spidev0.0'):
+    def __init__(self, length, spi='/dev/spidev0.0'):
         '''
         initialize strip with length pixels and setup SPI interface
         '''
-        spidev = open(spi, "wb")
+        self.spidev = open(spi, "wb")
         #set the spi frequency to 400kbps
-        #fcntl.ioctl(spidev, 0x40046b04, array.array('L', [400000]))
+        #fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [400000]))
+        self.length = length
         self.pixels = []
-        for i in range(lenght):
+        for i in range(length):
             pixel = Pixel()
             self.pixels.append(pixel)
 
@@ -32,8 +33,8 @@ class Strip(object):
         msg = bytearray()
         for _ in self.pixels:
             msg.extend(_.rgb)
-        spidev.write(msg)
-        spidev.flush()
+        self.spidev.write(msg)
+        self.spidev.flush()
 
     def all_off(self):
         '''
@@ -41,9 +42,9 @@ class Strip(object):
         '''
         msg = bytearray()
         for _ in self.pixels:
-            msg.extend(colors.BLACK)
-        spidev.write(msg)
-        spidev.flush()
+            msg.extend(BLACK)
+        self.spidev.write(msg)
+        self.spidev.flush()
 
 
 class Pixel(object):
@@ -53,6 +54,11 @@ class Pixel(object):
         self.green = 0
         self.blue = 0
         self.rgb = bytearray(3)
+
+    def latch(self):
+        self.rgb(0) = self.red
+        self.rgb(1) = self.green
+        self.rgb(2) = self.blue
 
     def set_color(self, color):
         self.rgb = color

@@ -1,5 +1,7 @@
 import logging
 import logging.handlers
+import random
+import colors
 import sys
 import time
 import zmq
@@ -39,6 +41,7 @@ class Runner(Thread):
         self.stop_event = Event()
         self.strip_mode = 'Halloween'
         self.strip_state = 'off'
+        self.thread = None
         self.strip = Strip(strip_length, spi='/tmp/teststrip.spi')
         LOG.debug("Initialized Daemon")
 
@@ -60,13 +63,21 @@ class Runner(Thread):
         try:
             self.data = json.loads(self.data.decode("utf-8"))
             self.data = self.data['strip']
-            self.state = self.data.get('state', self.state)
-            self.mode = self.data.get('mode', self.mode)
-            if self.state == 'on':
+            self.strip_state = self.data.get('state', self.strip_state)
+            self.strip_mode = self.data.get('mode', self.strip_mode)
+            if self.strip_state == 'on':
+                self.stop_event.set()
+                if self.thread:
+                    LOG.debug("Waiting for old thread to stop")
+                    self.thread.join()
+                    LOG.debug("Thread stopped")
                 self.stop_event.clear()
-                self.thread = self.mode(self.stop_event)
-                self.thread.start()
-            if self.state == 'off':
+                for cls in StripModes.__subclasses__():
+                    if cls.MODE == self.strip_mode:
+                        self.thread = cls(self.strip, self.stop_event)
+                        self.thread.start()
+                        break
+            if self.strip_state == 'off':
                 self.stop_event.set()
         except ValueError:
             LOG.exception('Value Error : {}'.format(self.data))
@@ -74,15 +85,22 @@ class Runner(Thread):
             LOG.exception('Exception : ')
         
 
-class Halloween(Thread):
+class StripModes(Thread):
 
-    def __init__(self, strip, stop_event):
-        super(Halloween, self).__init__()
+    def __init__(self, strip, stop):
+        super(StripModes, self).__init__()
         self.daemon = True
-        self.stop = stop_event
         self.strip = strip
+        self.stop = stop
+
+
+class Halloween(StripModes):
+    MODE = 'Halloween'
 
     def run(self):
+        LOG.debug("Running Halloween Mode")
+        LOG.debug("Stip length : {}".format(self.strip.length))
+        crange = [colors.AQUAMARINE, colors.BROWN, colors.CYAN, colors.DARKVIOLET, colors.RED, colors.DARKGREEN, colors.DARKBLUE, colors.YELLOW, colors.BLACK]
         while not self.stop.is_set():
             i = random.randint(0, 9)
             if i != random.choice([0, 9, 1, 8, 2, 7, 3, 6, 4, 5, 6, 4, 7, 3, 8, 2, 9, 1, 0]):
@@ -101,4 +119,26 @@ class Halloween(Thread):
                     self.strip.set_pixel(i, color=random.choice(crange))
                 self.strip.show()
             time.sleep(random.randint(2, 5) * 0.5)
+        LOG.debug("Stopping Halloween Mode")
+        self.strip.all_off()
+
+class Disco(StripModes):
+    MODE = 'Disco'
+    def run(self):
+        LOG.debug("Starting Disco Mode")
+        LOG.debug("Stip length : {}".format(self.strip.length))
+        while not self.stop.is_set():
+            for i in range(self.strip.length):
+                self.strip.set_pixel(i, color=colors.RED)
+            self.strip.show()
+            time.sleep(1)
+            for i in range(self.strip.length):
+                self.strip.set_pixel(i, color=colors.BLUE)
+            self.strip.show()
+            time.sleep(1)
+            for i in range(self.strip.length):
+                self.strip.set_pixel(i, color=colors.GREEN)
+            self.strip.show()
+            time.sleep(1)
+        LOG.debug("Stopping Disco Mode")
         self.strip.all_off()
