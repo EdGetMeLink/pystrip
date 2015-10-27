@@ -62,7 +62,7 @@ def index():
     response.headers['Content-Type'] = 'application/hal+json'
     return response
 
-@app.route('/strip/state/<state>', methods=['GET'])
+@app.route('/strip/state/<state>', methods=['POST', 'GET'])
 def stripstate(state):
     data = {
         'strip': {
@@ -74,7 +74,7 @@ def stripstate(state):
     response.headers['Content-Type'] = 'application/json'
     return response
 
-@app.route('/strip/mode/<mode>', methods=['GET'])
+@app.route('/strip/mode/<mode>', methods=['POST', 'GET'])
 def stripmode(mode):
     data = {
         'strip': {
