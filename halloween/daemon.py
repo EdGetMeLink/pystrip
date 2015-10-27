@@ -134,7 +134,7 @@ class Halloween(StripModes):
                     self.strip.set_pixel(i, color=random.choice(crange))
                 self.lock.release()
             time.sleep(random.randint(2, 5) * 0.5)
-        LOG.debug("Stopping Halloween Mode")
+        LOG.debug("Halloween Mode Stopped")
         self.strip.all_off()
 
 class Disco(StripModes):
@@ -158,13 +158,13 @@ class Disco(StripModes):
                 self.strip.set_pixel(i, color=colors.BLUE)
             self.lock.release()
             time.sleep(1)
-        LOG.debug("Stopping Disco Mode")
+        LOG.debug("Disco Mode Stopped")
         self.strip.all_off()
 
 class Smoothie(StripModes):
     MODE = 'Smoothie'
     def run(self):
-        LOG.debug("Starting Smoothie Mpde")
+        LOG.debug("Starting Smoothie Mode")
         LOG.debug("Stip length : {}".format(self.strip.length))
         while not self.stop.is_set():
             color = bytearray([0,0,0])
@@ -182,5 +182,5 @@ class Smoothie(StripModes):
                     self.strip.set_pixel(p, color=color)
                 self.lock.release()
                 time.sleep(0.002)
-        LOG.debug("Stopping Smoothie")
+        LOG.debug("Smoothie Stopped")
         self.strip.all_off()
