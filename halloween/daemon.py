@@ -4,7 +4,6 @@ import random
 import colors
 import sys
 import time
-import zmq
 import json
 
 from threading import Thread, Event, Timer, Lock
@@ -44,14 +43,14 @@ class Runner(Thread):
         self.strip_state = 'off'
         self.thread = None
         self.lock = Lock()
-        self.strip = Strip(strip_length, spi='/tmp/teststrip.spi')
+        self.strip = Strip(strip_length)
         LOG.debug("Initialized Daemon")
 
     def run(self):
 
         exitflag = False
         LOG.debug("Starting Timer")
-        self.refresh_timer = Timer(0.03, self.refresh_strip)
+        self.refresh_timer = Timer(0.01, self.refresh_strip)
         self.refresh_timer.start()
         while not exitflag:
             try:
@@ -93,7 +92,7 @@ class Runner(Thread):
         self.lock.acquire()
         self.strip.show()
         self.lock.release()
-        self.refresh_timer = Timer(0.04, self.refresh_strip)
+        self.refresh_timer = Timer(0.01, self.refresh_strip)
         self.refresh_timer.start()
 
 
@@ -120,24 +119,20 @@ class Halloween(StripModes):
             if i != random.choice([0, 9, 1, 8, 2, 7, 3, 6, 4, 5, 6, 4, 7, 3, 8, 2, 9, 1, 0]):
                 color = random.choice(crange[:-1])
                 for _ in '0110010110110011010101110111':
+                    self.lock.acquire()
                     if _ == random.choice(['0', '1']):
-                        self.lock.acquire()
                         self.strip.set_pixel(i, color=colors.BLACK)
-                        self.lock.release()
                     else:
-                        self.lock.acquire()
                         self.strip.set_pixel(i, color=color)
-                        self.lock.release()
+                    self.lock.release()
                     time.sleep(0.05)
             else:
+                self.lock.acquire()
                 if self.strip.pixels[i].rgb != colors.BLACK:
-                    self.lock.acquire()
                     self.strip.set_pixel(i, color=colors.BLACK)
-                    self.lock.release()
                 else:
-                    self.lock.acquire()
                     self.strip.set_pixel(i, color=random.choice(crange))
-                    self.lock.release()
+                self.lock.release()
             time.sleep(random.randint(2, 5) * 0.5)
         LOG.debug("Stopping Halloween Mode")
         self.strip.all_off()
@@ -148,20 +143,44 @@ class Disco(StripModes):
         LOG.debug("Starting Disco Mode")
         LOG.debug("Stip length : {}".format(self.strip.length))
         while not self.stop.is_set():
+            self.lock.acquire()
             for i in range(self.strip.length):
-                self.lock.acquire()
                 self.strip.set_pixel(i, color=colors.RED)
-                self.lock.release()
+            self.lock.release()
             time.sleep(1)
+            self.lock.acquire()
             for i in range(self.strip.length):
-                self.lock.acquire()
                 self.strip.set_pixel(i, color=colors.GREEN)
-                self.lock.release()
+            self.lock.release()
             time.sleep(1)
+            self.lock.acquire()
             for i in range(self.strip.length):
-                self.lock.acquire()
                 self.strip.set_pixel(i, color=colors.BLUE)
-                self.lock.release()
+            self.lock.release()
             time.sleep(1)
         LOG.debug("Stopping Disco Mode")
+        self.strip.all_off()
+
+class Smoothie(StripModes):
+    MODE = 'Smoothie'
+    def run(self):
+        LOG.debug("Starting Smoothie Mpde")
+        LOG.debug("Stip length : {}".format(self.strip.length))
+        while not self.stop.is_set():
+            color = bytearray([0,0,0])
+            for i in range(255):
+                color[0] = i
+                self.lock.acquire()
+                for p in range(self.strip.length):
+                    self.strip.set_pixel(p, color=color)
+                self.lock.release()
+                time.sleep(0.002)
+            for i in reversed(range(255)):
+                color[0] = i
+                self.lock.acquire()
+                for p in range(self.strip.length):
+                    self.strip.set_pixel(p, color=color)
+                self.lock.release()
+                time.sleep(0.002)
+        LOG.debug("Stopping Smoothie")
         self.strip.all_off()

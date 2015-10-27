@@ -14,7 +14,6 @@ setup(
     license="Private",
     install_requires=[
         'Flask',
-        'pyzmq',
     ],
     packages=find_packages(exclude=["tests.*", "tests"]),
     zip_safe=False,

@@ -1,6 +1,6 @@
 from flask import Flask, make_response, request
 import json
-from queue import Queue
+from Queue import Queue
 import logging
 import logging.handlers
 from halloween.daemon import Runner
@@ -10,6 +10,7 @@ SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
 app = Flask(__name__)
 
 queue = Queue()
+r = Runner(queue, 10)
 
 def setup_logging():
     LOG_FILE = "halloween.log"
@@ -27,6 +28,10 @@ def setup_logging():
     root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
 
+@app.before_first_request
+def daemon_starter():
+    print("Starting Daemon")
+    r.start()
 
 @app.route('/', methods=['GET'])
 def index():
@@ -84,7 +89,4 @@ def stripmode(mode):
 
 if __name__ == "__main__":
     setup_logging()
-    r = Runner(queue, 10)
-    print("Starting Daemon")
-    r.start()
     app.run(host='0.0.0.0', port=8080, debug=True)
