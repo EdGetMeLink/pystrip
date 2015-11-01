@@ -5,6 +5,7 @@ import colors
 import sys
 import time
 import json
+from Queue import Empty
 
 from threading import Thread, Event, Timer, Lock
 from halloween.strip import Strip
@@ -18,16 +19,16 @@ def setup_logging():
     root_logger.setLevel(logging.DEBUG)
     formatter = (
         '%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
-    #file_handler = logging.handlers.RotatingFileHandler(LOG_FILE,
-    #        maxBytes=1024*1024,
-    #        backupCount=5)
+    file_handler = logging.handlers.RotatingFileHandler(LOG_FILE,
+            maxBytes=1024*1024,
+            backupCount=5)
     file_handler = logging.FileHandler(LOG_FILE)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     console_handler = logging.StreamHandler()
     console_handler.setLevel(logging.DEBUG)
     console_handler.setFormatter(formatter)
-    #root_logger.addHandler(file_handler)
+    root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
 
 
@@ -54,9 +55,14 @@ class Runner(Thread):
         self.refresh_timer.start()
         while not exitflag:
             try:
-                self.data = self.queue.get()
+                self.data = self.queue.get(block=True, timeout=10)
                 LOG.debug("Data received %s" % self.data)
                 self.decode()
+            except Empty:
+                if not self.refresh_timer.isAlive():
+                    LOG.debug("Refresh Timer just died. Restarting")
+                    self.refresh_timer = Timer(0.01, self.refresh_strip)
+                    self.refresh_timer.start()
             except (Exception, KeyboardInterrupt, SystemExit) as e:
                 LOG.exception('Exception : {}'.format(e))
                 exitflag = True
