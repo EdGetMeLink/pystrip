@@ -54,22 +54,14 @@ class Runner(Thread):
 
         exitflag = False
         LOG.debug("Starting Timer")
-        self.refresh_timer = Timer(0.01, self.refresh_strip)
-        self.refresh_timer.start()
         while not exitflag:
             try:
-                self.data = self.queue.get(block=True, timeout=10)
+                self.data = self.queue.get()
                 LOG.debug("Data received %s" % self.data)
                 self.decode()
-            except Empty:
-                if not self.refresh_timer.isAlive():
-                    LOG.debug("Refresh Timer just died. Restarting")
-                    self.refresh_timer = Timer(0.01, self.refresh_strip)
-                    self.refresh_timer.start()
             except (Exception, KeyboardInterrupt, SystemExit) as e:
                 LOG.exception('Exception : {}'.format(e))
                 exitflag = True
-        self.refresh_timer.cancel()
 
     def decode(self):
         try:
@@ -96,13 +88,6 @@ class Runner(Thread):
             LOG.exception('Value Error : {}'.format(self.data))
         except:
             LOG.exception('Exception : ')
-
-    def refresh_strip(self):
-        self.lock.acquire()
-        self.strip.show()
-        self.lock.release()
-        self.refresh_timer = Timer(0.01, self.refresh_strip)
-        self.refresh_timer.start()
 
 
 class StripModes(Thread):
