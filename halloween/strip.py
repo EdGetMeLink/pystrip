@@ -1,7 +1,8 @@
 import fcntl
 import array
-from halloween.colors import BLACK
+from halloween.colors import Color
 import time
+BLACK = Color().BLACK
 
 class Strip(object):
 

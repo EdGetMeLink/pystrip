@@ -1,17 +1,20 @@
 import logging
 import logging.handlers
 import random
-import colors
+from halloween.colors import Color
 import sys
 import time
 import json
+import math
 from Queue import Empty
+import random
 
 from threading import Thread, Event, Timer, Lock
 from halloween.strip import Strip
 
 LOG = logging.getLogger(__name__)
 
+colors = Color()
 
 def setup_logging():
     LOG_FILE = "halloween.log"
