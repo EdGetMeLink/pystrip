@@ -15,6 +15,7 @@ class Strip(object):
         fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [400000]))
         self.length = length
         self.pixels = []
+        self.brightness = 50
         for i in range(length):
             pixel = Pixel()
             self.pixels.append(pixel)
@@ -24,9 +25,17 @@ class Strip(object):
         set singel pixel to color and state
         '''
         if color:
-            self.pixels[pixel].set_color(color)
+            self.pixels[pixel].set_color(self.brightness_adj(color))
         if state:
             self.pixels[pixel].set_state(state)
+
+    def brightness_adj(self, color):
+        c = bytearray([0, 0, 0])
+        c[0] = int(self.brightness * color[0] / 100)
+        c[1] = int(self.brightness * color[1] / 100)
+        c[2] = int(self.brightness * color[2] / 100)
+        return c
+
 
     def show(self):
         '''

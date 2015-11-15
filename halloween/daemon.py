@@ -43,7 +43,7 @@ class Runner(Thread):
         self.name = "Main Runner"
         self.queue = queue
         self.stop_event = Event()
-        self.strip_mode = 'Halloween'
+        self.strip_mode = 'Mover'
         self.strip_state = 'off'
         self.thread = None
         self.lock = Lock()
@@ -69,6 +69,7 @@ class Runner(Thread):
             self.data = self.data['strip']
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)
+            self.strip.brightness = int(self.data.get('brightness', self.strip.brightness))
             if self.strip_state == 'on':
                 self.stop_event.set()
                 if self.thread:
@@ -162,19 +163,77 @@ class Smoothie(StripModes):
         LOG.debug("Stip length : {}".format(self.strip.length))
         while not self.stop.is_set():
             color = bytearray([0,0,0])
-            for i in range(255):
+            for i in range(100):
                 color[0] = i
                 self.lock.acquire()
                 for p in range(self.strip.length):
                     self.strip.set_pixel(p, color=color)
                 self.lock.release()
-                time.sleep(0.002)
-            for i in reversed(range(255)):
+                time.sleep(0.02)
+            for i in reversed(range(100)):
                 color[0] = i
                 self.lock.acquire()
                 for p in range(self.strip.length):
                     self.strip.set_pixel(p, color=color)
                 self.lock.release()
-                time.sleep(0.002)
+                time.sleep(0.02)
         LOG.debug("Smoothie Stopped")
         self.strip.all_off()
+
+
+class Washer(StripModes):
+    MODE = "Washer"
+    def run(self):
+        LOG.debug("Starting Washer")
+        i = 0
+        color = bytearray([0,0,0])
+        while not self.stop.is_set():
+            i += 1
+            alpha = 0.00001 * i
+            alpha = 0.01 * i
+            if alpha >= 360:
+                i = 0
+            val_red = self.alpha_calc(alpha, 0)
+            val_green = self.alpha_calc(alpha, 90)
+            val_blue = self.alpha_calc(alpha, 180)
+            LOG.debug("{} {} {}".format(val_red, val_green, val_blue))
+            if color[0] < val_red:
+                color[0] = val_red
+            if color[1] < val_green:
+                color[1] = val_green
+            if color[2] < val_blue:
+                color[2] = val_blue
+            for p in range(self.strip.length):
+                self.strip.set_pixel(p, color=color)
+            self.strip.show()
+            time.sleep(0.3)
+        LOG.debug("Washer Stopped")
+        self.strip.all_off()
+
+    @staticmethod
+    def alpha_calc(alpha, phase):
+        fun = math.sin(alpha + phase)
+        fun = fun * 255
+        value = int(fun)
+        if value < 0:
+            value = 0
+        return value
+
+
+class Mover(StripModes):
+    MODE = 'Mover'
+    def run(self):
+        LOG.debug("Starting Mover")
+        colors = Color()
+        f = [val for attr, val in colors.__dict__.iteritems()]
+        #f = [colors.AQUAMARINE, colors.RED, colors.GREEN, colors.GREENYELLOW, colors.YELLOW, colors.WHITE, colors.ROSYBROWN, colors.PURPLE, colors.PINK]
+        while not self.stop.is_set():
+            for p in range(self.strip.length):
+                color = random.choice(f)
+                self.strip.set_pixel(p, color=color)
+            self.strip.show()
+            time.sleep(1)
+        LOG.debug("Mover Stopped")
+        self.strip.all_off()
+
+

@@ -10,7 +10,7 @@ SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
 app = Flask(__name__)
 
 queue = Queue()
-r = Runner(queue, 10)
+r = Runner(queue, 9)
 
 def setup_logging():
     LOG_FILE = "halloween.log"
@@ -56,6 +56,11 @@ def index():
                     'description': 'set strip state on or off',
                     'templated': False
                     },
+                'stripbrightness':{
+                    'href': '/strip/brightness',
+                    'description': 'set strip brightness in percent',
+                    'templated': False
+                    },
                 }
             )
     response = make_response(json.dumps(index), 200)
@@ -67,6 +72,18 @@ def stripstate(state):
     data = {
         'strip': {
             'state': state
+        }
+    }
+    queue.put(json.dumps(data))
+    response = make_response(json.dumps(data), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
+@app.route('/strip/brightness/<value>', methods=['POST', 'GET'])
+def stripbright(value):
+    data = {
+        'strip': {
+            'brightness': value
         }
     }
     queue.put(json.dumps(data))
