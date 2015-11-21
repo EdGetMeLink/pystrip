@@ -196,13 +196,9 @@ class Washer(StripModes):
             val_red = self.alpha_calc(alpha, 0)
             val_green = self.alpha_calc(alpha, 90)
             val_blue = self.alpha_calc(alpha, 180)
-            LOG.debug("{} {} {}".format(val_red, val_green, val_blue))
-            if color[0] < val_red:
-                color[0] = val_red
-            if color[1] < val_green:
-                color[1] = val_green
-            if color[2] < val_blue:
-                color[2] = val_blue
+            color[0] = val_red
+            color[1] = val_green
+            color[2] = val_blue
             for p in range(self.strip.length):
                 self.strip.set_pixel(p, color=color)
             self.strip.show()
