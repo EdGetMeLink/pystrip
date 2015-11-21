@@ -233,3 +233,14 @@ class Mover(StripModes):
         self.strip.all_off()
 
 
+class Mycolor(StripModes):
+    MODE='MyColor'
+    def run(self):
+        LOG.debug("Starting MyColor")
+        color = bytearray([0, 0, 0])
+        while not self.stop.is_set():
+            rred = random.randint(255)
+            time.sleep(1)
+            pass
+        LOG.debug("MyColor Stopped")
+        self.strip.all_off()
