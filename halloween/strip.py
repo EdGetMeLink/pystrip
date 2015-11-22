@@ -29,6 +29,13 @@ class Strip(object):
         if state:
             self.pixels[pixel].set_state(state)
 
+    def get_pixel(self, pixel):
+        '''
+        get singel pixel to color and state
+        '''
+        color = self.pixels[pixel].rgb
+        return color
+
     def brightness_adj(self, color):
         c = bytearray([0, 0, 0])
         c[0] = int(self.brightness * color[0] / 100)
