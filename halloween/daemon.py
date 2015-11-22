@@ -238,11 +238,65 @@ class Mover(StripModes):
 class Mycolor(StripModes):
     MODE='MyColor'
     def run(self):
+        def check(color, avr, dif):
+            c = 0 + color
+            if c < avr:
+                c += dif
+            else:
+                c -= dif
+            if c < 0:
+                c = random.randint(0, 255)
+            if c > 255:
+                c = random.randint(0, 255)
+            return c
+
+        neighbours = {
+                0: [1, 4, 5],
+                1: [0, 2, 3, 4, 5],
+                2: [1, 3, 4],
+                3: [1, 2, 4, 7, 8],
+                4: [0, 1, 2, 3, 5, 6, 7, 8],
+                5: [0, 1, 4, 6, 7],
+                6: [4, 5, 7],
+                7: [3, 4, 5, 6, 8],
+                8: [3, 4, 7]
+                }
         LOG.debug("Starting MyColor")
-        color = bytearray([0, 0, 0])
+        for led in range(self.strip.length):
+            rred = random.randint(0, 255)
+            rgreen = random.randint(0, 255)
+            rblue = random.randint(0, 255)
+            color = bytearray([rred, rgreen, rblue])
+            self.strip.set_pixel(led, color=color)
+        self.strip.show()
+        led = 0
         while not self.stop.is_set():
-            rred = random.randint(255)
+            ncount = len(neighbours[led])
+            total_red = 0
+            total_green = 0
+            total_blue = 0
+            for pix in neighbours[led]:
+                ncolor = self.strip.get_pixel(pix)
+                total_red += ncolor[0]
+                total_green += ncolor[1]
+                total_blue += ncolor[2]
+
+            avr_red = total_red / ncount
+            avr_green = total_green / ncount
+            avr_blue = total_blue / ncount
+            dif_red = color[0] - avr_red
+            dif_green = color[1] - avr_green
+            dif_blue = color[2] - avr_blue
+
+            color[0] = check(color[0], avr_red, dif_red)
+            color[1] = check(color[1], avr_green, dif_green)
+            color[2] = check(color[2], avr_blue, dif_blue)
+
+            self.strip.set_pixel(led, color=color)
+            self.strip.show()
             time.sleep(1)
-            pass
+            led += 1
+            if led > self.strip.length -1:
+                led = 0
         LOG.debug("MyColor Stopped")
         self.strip.all_off()
