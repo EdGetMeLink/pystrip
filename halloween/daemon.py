@@ -70,6 +70,8 @@ class Runner(Thread):
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)
             self.strip.brightness = int(self.data.get('brightness', self.strip.brightness))
+            if self.data.get('mode', None):
+                self.strip.all_off()
             if self.strip_state == 'on':
                 self.stop_event.set()
                 if self.thread:
