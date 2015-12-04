@@ -48,6 +48,7 @@ class Runner(Thread):
         self.thread = None
         self.lock = Lock()
         self.strip = Strip(strip_length)
+        self.data = None
         LOG.debug("Initialized Daemon")
 
     def run(self):

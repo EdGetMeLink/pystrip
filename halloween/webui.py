@@ -12,15 +12,19 @@ app = Flask(__name__)
 queue = Queue()
 r = Runner(queue, 9)
 
+
 def setup_logging():
+    """
+    setup logging for logger
+    """
     LOG_FILE = "halloween.log"
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s\n\t%(threadName)s - %(levelname)s - %(message)s')
     file_handler = logging.handlers.RotatingFileHandler(LOG_FILE,
-            maxBytes=1024*1024,
-            backupCount=5)
+                                                        maxBytes=1024 * 1024,
+                                                        backupCount=5)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
     console_handler = logging.StreamHandler()
@@ -29,46 +33,57 @@ def setup_logging():
     root_logger.addHandler(file_handler)
     root_logger.addHandler(console_handler)
 
+
 @app.before_first_request
 def daemon_starter():
     print("Starting Daemon")
     r.start()
 
+
 @app.route('/', methods=['GET'])
 def index():
+    '''
+    default route
+    :return: json document containing all possible rest routes
+    '''
     index = dict(
-            title="halloween backend",
-            description="RESTful Halloween PI backend",
-            version="0.0.1",
-            _links={
-                'strip':{
-                    'href': '/strip',
-                    'description': 'get information about curent strip config',
-                    'templated': False
-                    },
-                'stripmode':{
-                    'href': '/strip/mode',
-                    'description': 'posible values: halloween, disco',
-                    'templated': False
-                    },
-                'stripstate':{
-                    'href': '/strip/state',
-                    'description': 'set strip state on or off',
-                    'templated': False
-                    },
-                'stripbrightness':{
-                    'href': '/strip/brightness',
-                    'description': 'set strip brightness in percent',
-                    'templated': False
-                    },
-                }
-            )
+        title="halloween backend",
+        description="RESTful Halloween PI backend",
+        version="0.0.1",
+        _links={
+            'strip': {
+                'href': '/strip',
+                'description': 'get information about curent strip config',
+                'templated': False
+            },
+            'stripmode': {
+                'href': '/strip/mode',
+                'description': 'posible values: halloween, disco',
+                'templated': False
+            },
+            'stripstate': {
+                'href': '/strip/state',
+                'description': 'set strip state on or off',
+                'templated': False
+            },
+            'stripbrightness': {
+                'href': '/strip/brightness',
+                'description': 'set strip brightness in percent',
+                'templated': False
+            },
+        }
+    )
     response = make_response(json.dumps(index), 200)
     response.headers['Content-Type'] = 'application/hal+json'
     return response
 
+
 @app.route('/strip/state/<state>', methods=['POST', 'GET'])
 def stripstate(state):
+    """
+    set strip state to on or off
+    :type state: string
+    """
     data = {
         'strip': {
             'state': state
@@ -78,6 +93,7 @@ def stripstate(state):
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
+
 
 @app.route('/strip/brightness/<value>', methods=['POST', 'GET'])
 def stripbright(value):
@@ -91,8 +107,13 @@ def stripbright(value):
     response.headers['Content-Type'] = 'application/json'
     return response
 
+
 @app.route('/strip/mode/<mode>', methods=['POST', 'GET'])
 def stripmode(mode):
+    """
+    set the stripmode
+    :type mode: ony valid strip mode  (class) defined in daemon
+    """
     data = {
         'strip': {
             'mode': mode
@@ -104,7 +125,6 @@ def stripmode(mode):
     return response
 
 
-
 if __name__ == "__main__":
     setup_logging()
-    app.run(host='0.0.0.0', port=8080, debug=True)
+    app.run(host="0.0.0.0", port=8080, debug=True)
