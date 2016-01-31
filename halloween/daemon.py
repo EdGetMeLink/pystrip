@@ -1,16 +1,16 @@
 import logging
 import logging.handlers
-import random
 from halloween.colors import Color
 import sys
 import time
 import json
 import math
-from Queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
+from halloween.stripmodes import StripModes
 from halloween.strip import Strip
+from halloween.tictactoe import Game
 
 LOG = logging.getLogger(__name__)
 
@@ -92,17 +92,6 @@ class Runner(Thread):
             LOG.exception('Value Error : {}'.format(self.data))
         except:
             LOG.exception('Exception : ')
-
-
-class StripModes(Thread):
-
-    def __init__(self, strip, stop, lock):
-        super(StripModes, self).__init__()
-        self.daemon = True
-        self.strip = strip
-        self.stop = stop
-        self.lock = lock
-        self.name = 'StripMode'
 
 
 class Halloween(StripModes):

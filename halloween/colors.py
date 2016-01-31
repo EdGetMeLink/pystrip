@@ -1,3 +1,6 @@
+import random
+
+
 class Color():
     def __init__(self):
         self.BLACK = bytearray(b'\x00\x00\x00')
@@ -145,3 +148,11 @@ class Color():
         self.WHITESMOKE = bytearray(b'\xf5\xf5\xf5')
         self.YELLOW = bytearray(b'\xff\xff\x00')
         self.YELLOWGREEN = bytearray(b'\x9a\xcd\x32')
+
+    @staticmethod
+    def random_color():
+        colors = Color()
+        f = [val for attr, val in colors.__dict__.iteritems()]
+        random.seed()
+        return random.choice(f)
+

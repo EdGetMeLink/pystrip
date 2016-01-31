@@ -10,9 +10,10 @@ class Strip(object):
         '''
         initialize strip with length pixels and setup SPI interface
         '''
+        spi = "/tmp/strip_test"
         self.spidev = open(spi, "wb")
         #set the spi frequency to 400kbps
-        fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [400000]))
+        #fcntl.ioctl(self.spidev, 0x40046b04, array.array('L', [400000]))
         self.length = length
         self.pixels = []
         self.brightness = 50
