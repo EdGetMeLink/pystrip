@@ -150,9 +150,20 @@ class Color():
         self.YELLOWGREEN = bytearray(b'\x9a\xcd\x32')
 
     @staticmethod
-    def random_color():
+    def random_color(ignore=None):
         colors = Color()
+        crange = [
+                colors.AQUAMARINE,
+                colors.BROWN,
+                colors.CYAN,
+                colors.DARKVIOLET,
+                colors.RED,
+                colors.DARKGREEN,
+                colors.DARKBLUE,
+                colors.YELLOW]
+        if ignore in crange:
+            crange.remove(ignore)
         f = [val for attr, val in colors.__dict__.iteritems()]
         random.seed()
-        return random.choice(f)
+        return random.choice(crange)
 

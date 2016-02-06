@@ -34,7 +34,7 @@ class Game(StripModes):
         self.bot_name = 'TBot'
         self.bot_marker = ''
         self.winning_combos = (
-            [6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 3, 6], [1, 4, 7], [2, 5, 8],
+            [6, 7, 8], [3, 4, 5], [0, 1, 2], [0, 5, 6], [1, 4, 7], [2, 3, 8],
             [0, 4, 8], [2, 4, 6],
         )
         self.corners = [0,2,6,8]
@@ -49,7 +49,7 @@ class Game(StripModes):
            \t| %s | %s | %s |
            '''
         self.bot_color = Color.random_color()
-        self.player_color = Color.random_color()
+        self.player_color = Color.random_color(ignore=self.bot_color)
         LOG.debug("TicTacToe init")
 
     def run(self):
@@ -79,6 +79,7 @@ class Game(StripModes):
 
             for index, field in enumerate(board):
                 self.strip.set_pixel(index, color=Color().BLACK)
+        self.strip.show()
 
 
     def get_marker(self):

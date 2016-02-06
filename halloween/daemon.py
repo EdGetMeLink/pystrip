@@ -1,15 +1,18 @@
 import logging
 import logging.handlers
+import random
 from halloween.colors import Color
 import sys
 import time
 import json
 import math
+from Queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
-from halloween.stripmodes import StripModes
 from halloween.strip import Strip
+from halloween.stripmodes import StripModes
+
 from halloween.tictactoe import Game
 
 LOG = logging.getLogger(__name__)
@@ -48,7 +51,6 @@ class Runner(Thread):
         self.thread = None
         self.lock = Lock()
         self.strip = Strip(strip_length)
-        self.data = None
         LOG.debug("Initialized Daemon")
 
     def run(self):
@@ -241,15 +243,15 @@ class Mycolor(StripModes):
             return c
 
         neighbours = {
-                0: [1, 4, 5],
-                1: [0, 2, 3, 4, 5],
-                2: [1, 3, 4],
-                3: [1, 2, 4, 7, 8],
-                4: [0, 1, 2, 3, 5, 6, 7, 8],
-                5: [0, 1, 4, 6, 7],
-                6: [4, 5, 7],
-                7: [3, 4, 5, 6, 8],
-                8: [3, 4, 7]
+                0: [1, 5],
+                1: [0, 2, 3, 4],
+                2: [1, 3],
+                3: [2, 4, 8],
+                4: [1, 3, 5, 7],
+                5: [0, 4, 6],
+                6: [5, 7],
+                7: [6, 4, 8],
+                8: [3, 7]
                 }
         LOG.debug("Starting MyColor")
         for led in range(self.strip.length):
@@ -261,32 +263,30 @@ class Mycolor(StripModes):
         self.strip.show()
         led = 0
         while not self.stop.is_set():
-            ncount = len(neighbours[led])
-            total_red = 0
-            total_green = 0
-            total_blue = 0
-            for pix in neighbours[led]:
-                ncolor = self.strip.get_pixel(pix)
-                total_red += ncolor[0]
-                total_green += ncolor[1]
-                total_blue += ncolor[2]
+            for led in range(self.strip.length):
+                ncount = len(neighbours[led])
+                total_red = 0
+                total_green = 0
+                total_blue = 0
+                for pix in neighbours[led]:
+                    ncolor = self.strip.get_pixel(pix)
+                    total_red += ncolor[0]
+                    total_green += ncolor[1]
+                    total_blue += ncolor[2]
 
-            avr_red = total_red / ncount
-            avr_green = total_green / ncount
-            avr_blue = total_blue / ncount
-            dif_red = color[0] - avr_red
-            dif_green = color[1] - avr_green
-            dif_blue = color[2] - avr_blue
+                avr_red = total_red / ncount
+                avr_green = total_green / ncount
+                avr_blue = total_blue / ncount
+                dif_red = color[0] - avr_red
+                dif_green = color[1] - avr_green
+                dif_blue = color[2] - avr_blue
 
-            color[0] = check(color[0], avr_red, dif_red)
-            color[1] = check(color[1], avr_green, dif_green)
-            color[2] = check(color[2], avr_blue, dif_blue)
+                color[0] = check(color[0], avr_red, dif_red)
+                color[1] = check(color[1], avr_green, dif_green)
+                color[2] = check(color[2], avr_blue, dif_blue)
 
-            self.strip.set_pixel(led, color=color)
+                self.strip.set_pixel(led, color=color)
             self.strip.show()
             time.sleep(1)
-            led += 1
-            if led > self.strip.length -1:
-                led = 0
         LOG.debug("MyColor Stopped")
         self.strip.all_off()
