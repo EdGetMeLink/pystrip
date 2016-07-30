@@ -6,7 +6,7 @@ import sys
 import time
 import json
 import math
-from Queue import Empty
+from queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
@@ -215,7 +215,7 @@ class Mover(StripModes):
     def run(self):
         LOG.debug("Starting Mover")
         colors = Color()
-        f = [val for attr, val in colors.__dict__.iteritems()]
+        f = [val for attr, val in colors.__dict__.items()]
         #f = [colors.AQUAMARINE, colors.RED, colors.GREEN, colors.GREENYELLOW, colors.YELLOW, colors.WHITE, colors.ROSYBROWN, colors.PURPLE, colors.PINK]
         while not self.stop.is_set():
             for p in range(self.strip.length):

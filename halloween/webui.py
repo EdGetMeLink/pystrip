@@ -1,6 +1,6 @@
 from flask import Flask, make_response, request
 import json
-from Queue import Queue
+from queue import Queue
 import logging
 import logging.handlers
 from halloween.daemon import Runner
