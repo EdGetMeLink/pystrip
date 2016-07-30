@@ -20,7 +20,7 @@ def setup_logging():
     """
     LOG_FILE = "halloween.log"
     root_logger = logging.getLogger()
-    root_logger.setLevel(logging.WARNING)
+    root_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
         '%(asctime)s - %(name)s\n\t%(threadName)s - %(levelname)s - %(message)s')
     file_handler = logging.handlers.RotatingFileHandler(LOG_FILE,
