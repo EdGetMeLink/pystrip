@@ -9,4 +9,3 @@ class StripModes(Thread):
         self.stop = stop
         self.lock = lock
         self.name = 'StripMode'
-        print("stripmode init")

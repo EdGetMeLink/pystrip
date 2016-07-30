@@ -10,7 +10,7 @@ from queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
-from halloween.strip import Strip
+from halloween.strip import ArduinoStrip
 from halloween.stripmodes import StripModes
 
 from halloween.tictactoe import Game
@@ -47,10 +47,14 @@ class Runner(Thread):
         self.queue = queue
         self.stop_event = Event()
         self.strip_mode = 'Mover'
-        self.strip_state = 'off'
+        self.strip_state = 'on'
         self.thread = None
         self.lock = Lock()
-        self.strip = Strip(strip_length)
+        #self.strip = Strip(strip_length)
+        self.strip = ArduinoStrip(
+                x=3, 
+                y=3,
+                host="http://10.10.20.12/strip")
         LOG.debug("Initialized Daemon")
 
     def run(self):
