@@ -4,6 +4,7 @@ from queue import Queue
 import logging
 import logging.handlers
 from halloween.daemon import Runner
+import halloween.stripmodes as stripmodes
 
 LOG = logging.getLogger(__name__)
 SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
@@ -46,6 +47,7 @@ def index():
     default route
     :return: json document containing all possible rest routes
     '''
+    modes = [_.MODE for _ in stripmodes.StripModes.__subclasses__()]
     index = dict(
         title="halloween backend",
         description="RESTful Halloween PI backend",
@@ -56,17 +58,17 @@ def index():
                 'description': 'get information about curent strip config',
                 'templated': False
             },
-            'stripmode': {
+            'strip mode': {
                 'href': '/strip/mode',
-                'description': 'posible values: halloween, disco',
+                'description': 'posible values: {}'.format(', '.join(modes)),
                 'templated': False
             },
-            'stripstate': {
+            'strip state': {
                 'href': '/strip/state',
                 'description': 'set strip state on or off',
                 'templated': False
             },
-            'stripbrightness': {
+            'strip brightness': {
                 'href': '/strip/brightness',
                 'description': 'set strip brightness in percent',
                 'templated': False
