@@ -163,7 +163,7 @@ class Color():
                 colors.YELLOW]
         if ignore in crange:
             crange.remove(ignore)
-        f = [val for attr, val in colors.__dict__.iteritems()]
+        f = [val for attr, val in colors.__dict__.items()]
         random.seed()
         return random.choice(crange)
 
