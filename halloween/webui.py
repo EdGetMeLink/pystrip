@@ -1,3 +1,4 @@
+import argparse
 from flask import Flask, make_response, request
 import json
 from queue import Queue
@@ -126,7 +127,14 @@ def stripmode(mode):
     response.headers['Content-Type'] = 'application/json'
     return response
 
+def setup_parser():
+    parser = argparse.ArgumentParser(description="change default strip class")
+    parser.add_argument("--show", dest="show", action='store_true')
+    return parser
 
 if __name__ == "__main__":
     setup_logging()
+    parser = setup_parser()
+    args = parser.parse_args()
+
     app.run(host="0.0.0.0", port=8081, debug=True)
