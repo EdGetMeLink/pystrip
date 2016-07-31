@@ -103,6 +103,7 @@ class Smoothie(StripModes):
                 self.lock.acquire()
                 for p in range(self.strip.length):
                     self.strip.set_pixel(p, color=color)
+                self.strip.show()
                 self.lock.release()
                 time.sleep(0.02)
             for i in reversed(range(100)):
@@ -110,6 +111,7 @@ class Smoothie(StripModes):
                 self.lock.acquire()
                 for p in range(self.strip.length):
                     self.strip.set_pixel(p, color=color)
+                self.strip.show()
                 self.lock.release()
                 time.sleep(0.02)
         LOG.debug("Smoothie Stopped")
