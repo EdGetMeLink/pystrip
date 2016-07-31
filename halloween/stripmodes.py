@@ -47,17 +47,19 @@ class Halloween(StripModes):
                 for _ in '0110010110110011010101110111':
                     self.lock.acquire()
                     if _ == random.choice(['0', '1']):
-                        self.strip.set_pixel(i, color=Color.BLACK)
+                        self.strip.set_pixel(i, color=Color().BLACK)
                     else:
                         self.strip.set_pixel(i, color=color)
+                    self.strip.show()
                     self.lock.release()
                     time.sleep(0.05)
             else:
                 self.lock.acquire()
-                if self.strip.pixels[i].rgb != Color.BLACK:
-                    self.strip.set_pixel(i, color=Color.BLACK)
+                if self.strip.pixels[i].rgb != Color().BLACK:
+                    self.strip.set_pixel(i, color=Color().BLACK)
                 else:
                     self.strip.set_pixel(i, color=random.choice(crange))
+                self.strip.show()
                 self.lock.release()
             time.sleep(random.randint(2, 5) * 0.5)
         LOG.debug("Halloween Mode Stopped")
@@ -157,8 +159,8 @@ class Mover(StripModes):
     MODE = 'Mover'
     def run(self):
         LOG.debug("Starting Mover")
-        Color = Color()
-        f = [val for attr, val in Color.__dict__.items()]
+        color = Color()
+        f = [val for attr, val in color.__dict__.items()]
         #f = [Color.AQUAMARINE, Color.RED, Color.GREEN, Color.GREENYELLOW, Color.YELLOW, Color.WHITE, Color.ROSYBROWN, Color.PURPLE, Color.PINK]
         while not self.stop.is_set():
             for p in range(self.strip.length):
