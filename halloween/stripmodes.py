@@ -30,7 +30,16 @@ class Halloween(StripModes):
     def run(self):
         LOG.debug("Running Halloween Mode")
         LOG.debug("Stip length : {}".format(self.strip.length))
-        crange = [colors.AQUAMARINE, colors.BROWN, colors.CYAN, colors.DARKVIOLET, colors.RED, colors.DARKGREEN, colors.DARKBLUE, colors.YELLOW, colors.BLACK]
+        crange = [
+                Color().AQUAMARINE,
+                Color().BROWN,
+                Color().CYAN, 
+                Color().DARKVIOLET, 
+                Color().RED,
+                Color().DARKGREEN,
+                Color().DARKBLUE,
+                Color().YELLOW,
+                Color().BLACK]
         while not self.stop.is_set():
             i = random.randint(0, 9)
             if i != random.choice([0, 9, 1, 8, 2, 7, 3, 6, 4, 5, 6, 4, 7, 3, 8, 2, 9, 1, 0]):
@@ -38,21 +47,22 @@ class Halloween(StripModes):
                 for _ in '0110010110110011010101110111':
                     self.lock.acquire()
                     if _ == random.choice(['0', '1']):
-                        self.strip.set_pixel(i, color=colors.BLACK)
+                        self.strip.set_pixel(i, color=Color.BLACK)
                     else:
                         self.strip.set_pixel(i, color=color)
                     self.lock.release()
                     time.sleep(0.05)
             else:
                 self.lock.acquire()
-                if self.strip.pixels[i].rgb != colors.BLACK:
-                    self.strip.set_pixel(i, color=colors.BLACK)
+                if self.strip.pixels[i].rgb != Color.BLACK:
+                    self.strip.set_pixel(i, color=Color.BLACK)
                 else:
                     self.strip.set_pixel(i, color=random.choice(crange))
                 self.lock.release()
             time.sleep(random.randint(2, 5) * 0.5)
         LOG.debug("Halloween Mode Stopped")
         self.strip.all_off()
+
 
 class Disco(StripModes):
     MODE = 'Disco'
@@ -62,17 +72,20 @@ class Disco(StripModes):
         while not self.stop.is_set():
             self.lock.acquire()
             for i in range(self.strip.length):
-                self.strip.set_pixel(i, color=colors.RED)
+                self.strip.set_pixel(i, color=Color().RED)
+            self.strip.show()
             self.lock.release()
             time.sleep(1)
             self.lock.acquire()
             for i in range(self.strip.length):
-                self.strip.set_pixel(i, color=colors.GREEN)
+                self.strip.set_pixel(i, color=Color().GREEN)
+            self.strip.show()
             self.lock.release()
             time.sleep(1)
             self.lock.acquire()
             for i in range(self.strip.length):
-                self.strip.set_pixel(i, color=colors.BLUE)
+                self.strip.set_pixel(i, color=Color().BLUE)
+            self.strip.show()
             self.lock.release()
             time.sleep(1)
         LOG.debug("Disco Mode Stopped")
@@ -142,9 +155,9 @@ class Mover(StripModes):
     MODE = 'Mover'
     def run(self):
         LOG.debug("Starting Mover")
-        colors = Color()
-        f = [val for attr, val in colors.__dict__.items()]
-        #f = [colors.AQUAMARINE, colors.RED, colors.GREEN, colors.GREENYELLOW, colors.YELLOW, colors.WHITE, colors.ROSYBROWN, colors.PURPLE, colors.PINK]
+        Color = Color()
+        f = [val for attr, val in Color.__dict__.items()]
+        #f = [Color.AQUAMARINE, Color.RED, Color.GREEN, Color.GREENYELLOW, Color.YELLOW, Color.WHITE, Color.ROSYBROWN, Color.PURPLE, Color.PINK]
         while not self.stop.is_set():
             for p in range(self.strip.length):
                 color = random.choice(f)
