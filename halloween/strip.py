@@ -137,12 +137,24 @@ class NoStrip(Strip):
             self.pixels.append(pixel)
 
     def show(self):
+        print("{:^3}|{:^3}|{:^5}|{:^5}|{:^5}".format(
+            "x", "y", "red", "green", "blue")
+        )
         for pixel in self.pixels:
-            print(pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue)
+            print("{:^3}|{:^3}|{:^5}|{:^5}|{:^5}".format(
+                pixel.x,
+                pixel.y,
+                pixel.red,
+                pixel.green,
+                pixel.blue)
+            )
+        print("-" * 80)
 
     def all_off(self):
+        print("x y red green blue")
         for pixel in self.pixels:
             print(pixel.x, pixel.y, 0, 0, 0)
+        print("-" * 80)
 
 
 class Pixel(object):
