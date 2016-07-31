@@ -3,6 +3,7 @@ import copy
 import time
 import random
 import logging
+import math
 from threading import Thread
 from colors import Color
 
