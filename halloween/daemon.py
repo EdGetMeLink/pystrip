@@ -39,7 +39,7 @@ def setup_logging():
 
 class Runner(Thread):
 
-    def __init__(self, queue, strip_length):
+    def __init__(self, queue, strip_length, show=False):
         super(Runner, self).__init__()
         self.daemon = True
         self.name = "Main Runner"
@@ -50,10 +50,13 @@ class Runner(Thread):
         self.thread = None
         self.lock = Lock()
         #self.strip = Strip(strip_length)
-        self.strip = ArduinoStrip(
-                x=3, 
-                y=3,
-                host="http://10.10.20.12/strip")
+        if not show:
+            self.strip = ArduinoStrip(
+                    x=3, 
+                    y=3,
+                    host="http://10.10.20.12/strip")
+        else:
+            self.strip = NoStrip(strip_length)
         LOG.debug("Initialized Daemon")
 
     def run(self):
