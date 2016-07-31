@@ -83,7 +83,7 @@ class Runner(Thread):
                 self.strip.all_off()
             if self.strip_state == 'on':
                 self.stop_event.set()
-                if self.thread:
+                if self.thread and self.thread.is_alive():
                     LOG.debug("Waiting for old thread to stop")
                     self.thread.join()
                     LOG.debug("Thread stopped")
