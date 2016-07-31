@@ -11,9 +11,6 @@ LOG = logging.getLogger(__name__)
 SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
 app = Flask(__name__)
 
-queue = Queue()
-r = Runner(queue, 9)
-
 
 def setup_logging():
     """
@@ -39,7 +36,7 @@ def setup_logging():
 @app.before_first_request
 def daemon_starter():
     print("Starting Daemon")
-    r.start()
+    app.runner.start()
 
 
 @app.route('/', methods=['GET'])
@@ -92,7 +89,7 @@ def stripstate(state):
             'state': state
         }
     }
-    queue.put(json.dumps(data))
+    app.queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
@@ -105,7 +102,7 @@ def stripbright(value):
             'brightness': value
         }
     }
-    queue.put(json.dumps(data))
+    app.queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
@@ -122,7 +119,7 @@ def stripmode(mode):
             'mode': mode
         }
     }
-    queue.put(json.dumps(data))
+    app.queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
@@ -136,5 +133,7 @@ if __name__ == "__main__":
     setup_logging()
     parser = setup_parser()
     args = parser.parse_args()
+    app.queue = Queue()
+    app.runner = Runner(app.queue, 9, show=args.show)
 
     app.run(host="0.0.0.0", port=8081, debug=True)
