@@ -124,6 +124,27 @@ class ArduinoStrip(Strip):
                 time.sleep(20)
 
 
+class NoStrip(Strip):
+    """
+    this class only prints the strip to stdout
+    """
+    def __init__(self, length):
+        self.pixels = []
+        self.brightness = 100
+        self.length = length
+        for i in range(length):
+            pixel = Pixel(x=i)
+            self.pixels.append(pixel)
+
+    def show(self):
+        for pixel in self.pixels:
+            print(pixel.x, pixel.y, pixel.red, pixel.green, pixel.blue)
+
+    def all_off(self):
+        for pixel in self.pixels:
+            print(pixel.x, pixel.y, 0, 0, 0)
+
+
 class Pixel(object):
 
     def __init__(self, x=0, y=0):

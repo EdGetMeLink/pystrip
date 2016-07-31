@@ -10,7 +10,7 @@ from queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
-from halloween.strip import ArduinoStrip
+from halloween.strip import ArduinoStrip, NoStrip
 import halloween.stripmodes as stripmodes
 
 
