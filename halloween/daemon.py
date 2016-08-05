@@ -81,6 +81,11 @@ class Runner(Thread):
             self.strip.brightness = int(self.data.get('brightness', self.strip.brightness))
             if self.data.get('mode', None):
                 self.strip.all_off()
+                self.stop_event.set()
+                if self.thread and self.thread.is_alive():
+                    LOG.debug("Waiting for thread to stop (none mode)")
+                    self.thread.join()
+                    LOG.debug("Thread stopped")
             if self.strip_state == 'on':
                 self.stop_event.set()
                 if self.thread and self.thread.is_alive():
@@ -96,6 +101,10 @@ class Runner(Thread):
                         break
             if self.strip_state == 'off':
                 self.stop_event.set()
+                if self.thread and self.thread.is_alive():
+                    LOG.debug("Waiting for thread to stop (received off)")
+                    self.thread.join()
+                    LOG.debug("Thread stopped")
         except ValueError:
             LOG.exception('Value Error : {}'.format(self.data))
         except:
