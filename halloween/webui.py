@@ -71,6 +71,11 @@ def index():
                 'description': 'set strip brightness in percent',
                 'templated': False
             },
+            'strip color': {
+                'href': '/strip/color/<red>/<green>/<blue>',
+                'description': 'set strip uniform color (rgb)',
+                'templated': False
+            },
         }
     )
     response = make_response(json.dumps(index), 200)
@@ -123,6 +128,31 @@ def stripmode(mode):
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
     return response
+
+
+@app.route('/strip/color/<path:colordata>', methods=['POST', 'GET'])
+def stripcolor(colordata):
+    """
+    set the strip uniform color
+    """
+    colors = colordata.split("/")
+    data = {
+        'strip': {
+            'color': colors
+        }
+    }
+    for color in colors:
+        try:
+            c = int(color, 10)
+        except ValueError:
+            response = make_response(json.dumps(data), 400)
+            response.headers['Content-Type'] = 'application/json'
+            return response
+    app.queue.put(json.dumps(data))
+    response = make_response(json.dumps(data), 200)
+    response.headers['Content-Type'] = 'application/json'
+    return response
+
 
 def setup_parser():
     parser = argparse.ArgumentParser(description="change default strip class")

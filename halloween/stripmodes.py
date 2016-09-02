@@ -24,6 +24,13 @@ class StripModes(Thread):
         self.name = 'StripMode'
 
 
+class OneColor(StripModes):
+    MODE = 'OneColor'
+    def run(self):
+        LOG.debug("Running one Color mode")
+        return
+
+
 class Halloween(StripModes):
     MODE = 'Halloween'
 

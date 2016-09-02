@@ -45,7 +45,7 @@ class Runner(Thread):
         self.name = "Main Runner"
         self.queue = queue
         self.stop_event = Event()
-        self.strip_mode = 'Mover'
+        self.strip_mode = 'off'
         self.strip_state = 'on'
         self.thread = None
         self.lock = Lock()
@@ -68,44 +68,69 @@ class Runner(Thread):
                 self.data = self.queue.get()
                 LOG.debug("Data received %s" % self.data)
                 self.decode()
+                self.execute()
             except (Exception, KeyboardInterrupt, SystemExit) as e:
                 LOG.exception('Exception : {}'.format(e))
                 exitflag = True
 
     def decode(self):
+        """
+        decode incoming json and map received data
+        """
         try:
             self.data = json.loads(self.data)
             self.data = self.data['strip']
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)
             self.strip.brightness = int(self.data.get('brightness', self.strip.brightness))
-            if self.data.get('mode', None):
-                self.strip.all_off()
-                self.stop_event.set()
-                if self.thread and self.thread.is_alive():
-                    LOG.debug("Waiting for thread to stop (none mode)")
-                    self.thread.join()
-                    LOG.debug("Thread stopped")
-            if self.strip_state == 'on':
-                self.stop_event.set()
-                if self.thread and self.thread.is_alive():
-                    LOG.debug("Waiting for old thread to stop")
-                    self.thread.join()
-                    LOG.debug("Thread stopped")
-                self.stop_event.clear()
-                for cls in stripmodes.StripModes.__subclasses__():
-                    if cls.MODE == self.strip_mode:
-                        self.thread = cls(
-                                self.strip, self.stop_event, self.lock)
-                        self.thread.start()
-                        break
-            if self.strip_state == 'off':
-                self.stop_event.set()
-                if self.thread and self.thread.is_alive():
-                    LOG.debug("Waiting for thread to stop (received off)")
-                    self.thread.join()
-                    LOG.debug("Thread stopped")
+            self.color_decode(self.data.get('color'))
         except ValueError:
             LOG.exception('Value Error : {}'.format(self.data))
         except:
             LOG.exception('Exception : ')
+
+    def execute(self):
+        """
+        execute thread according to strip mode and state
+        """
+        if self.strip_mode == "off":
+            LOG.debug("strip_mode off")
+            self.strip.all_off()
+            self.stop_event.set()
+            if self.thread and self.thread.is_alive():
+                LOG.debug("Waiting for thread to stop (none mode)")
+                self.thread.join()
+                LOG.debug("Thread stopped")
+        if self.strip_state == 'on':
+            self.stop_event.set()
+            if self.thread and self.thread.is_alive():
+                LOG.debug("Waiting for old thread to stop")
+                self.thread.join()
+                LOG.debug("Thread stopped")
+            self.stop_event.clear()
+            for cls in stripmodes.StripModes.__subclasses__():
+                if cls.MODE == self.strip_mode:
+                    self.thread = cls(
+                            self.strip, self.stop_event, self.lock)
+                    self.thread.start()
+                    break
+        if self.strip_state == 'off':
+            self.stop_event.set()
+            if self.thread and self.thread.is_alive():
+                LOG.debug("Waiting for thread to stop (received off)")
+                self.thread.join()
+                LOG.debug("Thread stopped")
+
+    def color_decode(self, colordata):
+        """
+        decode and set strip color to colordata
+        """
+        if not colordata:
+            return
+        colors = []
+        for color in colordata:
+            colors.append(int(color, 10))
+        for i in range(self.strip.length):
+            self.strip.set_pixel(i, color=bytearray(colors))
+        self.strip.show()
+        return

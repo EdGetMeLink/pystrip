@@ -151,7 +151,7 @@ class NoStrip(Strip):
         print("-" * 80)
 
     def all_off(self):
-        print("x y red green blue")
+        print("x y red green blue all off")
         for pixel in self.pixels:
             print(pixel.x, pixel.y, 0, 0, 0)
         print("-" * 80)
