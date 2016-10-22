@@ -1,0 +1,14 @@
+Installation instructions for Raspberry Pi
+
+edit /etc/modules and add 
+spi-bcm2708
+
+create /etc/udev/rules.d/51-i2c.rules and add
+SUBSYSTEM=="spidev", GROUP="users", MODE="0660"
+
+edit /boot/config.txt add
+
+device_tree_param=spi=on
+dtoverlay=spi-bcm2708
+
+reboot and you are ready to go
