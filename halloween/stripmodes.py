@@ -73,6 +73,48 @@ class Halloween(StripModes):
         self.strip.all_off()
 
 
+class Helloween2(StripModes):
+    MODE = 'Helloween2'
+
+    def __init__(self, strip, stop, lock):
+        super(Helloween2, self).__init__(strip, stop, lock)
+        self.pixel_per_pumpkin = 3
+        self.pumpkins = []
+        self.pumpkins = [self.strip.pixels[_:_+self.pixel_per_pumpkin] for _ in range(0, self.strip.length, self.pixel_per_pumpkin)]
+
+    def run(self):
+        LOG.debug("Starting Helloween2")
+        LOG.debug("Stip length : {}".format(self.strip.length))
+        crange = [
+                Color().AQUAMARINE,
+                Color().BROWN,
+                Color().CYAN, 
+                Color().DARKVIOLET, 
+                Color().RED,
+                Color().DARKGREEN,
+                Color().DARKBLUE,
+                Color().YELLOW]
+        while not self.stop.is_set():
+            pumkin = random.choice(self.pumpkins)
+            color = random.choice(crange[:-1])
+            for _ in '0110010110110011010101110111':
+                self.lock.acquire()
+                if _ == random.choice(['0', '1']):
+                    for pixel in pumkin:
+                        pixel.set_color(color=Color().BLACK)
+                else:
+                    for pixel in pumkin:
+                        pixel.set_color(color=color)
+                self.strip.show()
+                self.lock.release()
+                time.sleep(0.05)
+            time.sleep(random.randint(2, 5) * 0.5)
+
+        LOG.debug("Helloween2 Mode Stopped")
+        self.strip.all_off()
+
+
+
 class Disco(StripModes):
     MODE = 'Disco'
     def run(self):
