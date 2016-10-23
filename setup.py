@@ -14,6 +14,7 @@ setup(
     license="Private",
     install_requires=[
         'Flask',
+        'requests',
     ],
     packages=find_packages(exclude=["tests.*", "tests"]),
     zip_safe=False,
