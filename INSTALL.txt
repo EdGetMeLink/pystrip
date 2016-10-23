@@ -1,5 +1,7 @@
 Installation instructions for Raspberry Pi
 
+Install Python3 and Python3-dev
+
 edit /etc/modules and add 
 spi-bcm2708
 
