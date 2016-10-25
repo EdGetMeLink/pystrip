@@ -15,6 +15,7 @@ setup(
     install_requires=[
         'Flask',
         'requests',
+        'config-resolver',
     ],
     packages=find_packages(exclude=["tests.*", "tests"]),
     zip_safe=False,

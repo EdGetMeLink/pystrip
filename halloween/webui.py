@@ -1,9 +1,9 @@
-import argparse
 from flask import Flask, make_response, request
 import json
 from queue import Queue
 import logging
 import logging.handlers
+from halloween.config import load_config
 from halloween.daemon import Runner
 import halloween.stripmodes as stripmodes
 
@@ -154,16 +154,12 @@ def stripcolor(colordata):
     return response
 
 
-def setup_parser():
-    parser = argparse.ArgumentParser(description="change default strip class")
-    parser.add_argument("--show", dest="show", action='store_true')
-    return parser
-
 if __name__ == "__main__":
     setup_logging()
-    parser = setup_parser()
-    args = parser.parse_args()
+    cfg = load_config()
+    striptype = cfg.get("general", "striptype")
+    striplenght = int(cfg.get("general", "striplenght"))
     app.queue = Queue()
-    app.runner = Runner(app.queue, 50, show=args.show)
+    app.runner = Runner(app.queue, striplenght, striptype)
 
     app.run(host="0.0.0.0", port=8081, debug=True)
