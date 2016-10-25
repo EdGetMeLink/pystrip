@@ -204,6 +204,31 @@ class Washer(StripModes):
         return value
 
 
+class Firelane(StripModes):
+    MODE = 'Firelane'
+    def run(self):
+        LOG.debug("Starting Firelane")
+        crange = [
+                Color().AQUAMARINE,
+                Color().BROWN,
+                Color().CYAN, 
+                Color().DARKVIOLET, 
+                Color().RED,
+                Color().DARKGREEN,
+                Color().DARKBLUE,
+                Color().YELLOW]
+        while not self.stop.is_set():
+            pcol = random.choice(crange)
+            for p in range(self.strip.length):
+                if p % 5:
+                    self.strip.set_pixel(p, color=Color().BLACK)
+                self.strip.set_pixel(p, color=pcol)
+                self.strip.show()
+                time.sleep(0.2)
+        LOG.debug("Firelane Stopped")
+        self.strip.all_off()
+
+
 class Mover(StripModes):
     MODE = 'Mover'
     def run(self):
