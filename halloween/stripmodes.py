@@ -217,14 +217,19 @@ class Firelane(StripModes):
                 Color().DARKGREEN,
                 Color().DARKBLUE,
                 Color().YELLOW]
+        round = 0
+        pcol = random.choice(crange)
         while not self.stop.is_set():
-            pcol = random.choice(crange)
+            round += 1
+            if round == 51:
+              round = 1
+              pcol = random.choice(crange)
             for p in range(self.strip.length):
-                if p % 5:
+                if p == round:
                     self.strip.set_pixel(p, color=Color().BLACK)
-                self.strip.set_pixel(p, color=pcol)
+                else:
+                    self.strip.set_pixel(p, color=pcol)
                 self.strip.show()
-                time.sleep(0.2)
         LOG.debug("Firelane Stopped")
         self.strip.all_off()
 

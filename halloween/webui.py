@@ -164,6 +164,6 @@ if __name__ == "__main__":
     parser = setup_parser()
     args = parser.parse_args()
     app.queue = Queue()
-    app.runner = Runner(app.queue, 9, show=args.show)
+    app.runner = Runner(app.queue, 50, show=args.show)
 
     app.run(host="0.0.0.0", port=8081, debug=True)
