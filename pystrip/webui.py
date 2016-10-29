@@ -1,4 +1,4 @@
-from flask import Flask, make_response, request
+from flask import Flask, make_response
 import json
 from queue import Queue
 import logging
@@ -143,7 +143,7 @@ def stripcolor(colordata):
     }
     for color in colors:
         try:
-            c = int(color, 10)
+            int(color, 10)
         except ValueError:
             response = make_response(json.dumps(data), 400)
             response.headers['Content-Type'] = 'application/json'
