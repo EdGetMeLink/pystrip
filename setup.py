@@ -8,7 +8,7 @@ setup(
     author_email='mike@deltgen.net',
     name='pystrip',
     version=VERSION,
-    description='Raspberry Pi WS2801 Led Strip Software'
+    description='Raspberry Pi WS2801 Led Strip Software',
     url='www.deltgen.net',
     include_package_data=True,
     license="Private",
@@ -19,3 +19,4 @@ setup(
     ],
     packages=find_packages(exclude=["tests.*", "tests"]),
     zip_safe=False,
+)
