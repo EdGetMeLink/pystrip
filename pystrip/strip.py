@@ -46,7 +46,6 @@ class Strip(object):
         c[2] = int(self.brightness * color[2] / 100)
         return c
 
-
     def show(self):
         '''
         show the strip (pipe the data to the strip leds)
@@ -100,7 +99,7 @@ class ArduinoStrip(Strip):
                 "blue": pixel.blue
             }
             try:
-                ret = requests.post(self.host, data=payload)
+                requests.post(self.host, data=payload)
             except:
                 print("Exception raised on request. sleeping for 20 seconds")
                 time.sleep(20)
@@ -118,7 +117,7 @@ class ArduinoStrip(Strip):
                 "blue": 0
             }
             try:
-                ret = requests.post(self.host, data=payload)
+                requests.post(self.host, data=payload)
             except:
                 print("Exception raised on request. sleeping for 20 seconds")
                 time.sleep(20)
@@ -175,5 +174,5 @@ class Pixel(object):
     def set_color(self, color):
         self.rgb = color
         self.red = int(self.rgb[0])
-        self.green  = int(self.rgb[1])
+        self.green = int(self.rgb[1])
         self.blue = int(self.rgb[2])

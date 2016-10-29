@@ -1,15 +1,10 @@
 import logging
 import logging.handlers
-import random
 from pystrip.colors import Color
-import sys
-import time
 import json
-import math
-from queue import Empty
-import random
 
-from threading import Thread, Event, Timer, Lock
+
+from threading import Thread, Event, Lock
 from pystrip.strip import ArduinoStrip, NoStrip, Strip
 import pystrip.stripmodes as stripmodes
 
@@ -18,15 +13,15 @@ LOG = logging.getLogger(__name__)
 
 colors = Color()
 
+
 def setup_logging():
     LOG_FILE = "pystrip.log"
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     formatter = (
         '%(asctime)s - %(name)s - %(threadName)s - %(levelname)s - %(message)s')
-    file_handler = logging.handlers.RotatingFileHandler(LOG_FILE,
-            maxBytes=1024*1024,
-            backupCount=5)
+    file_handler = logging.handlers.RotatingFileHandler(
+        LOG_FILE, maxBytes=1024*1024, backupCount=5)
     file_handler = logging.FileHandler(LOG_FILE)
     file_handler.setLevel(logging.DEBUG)
     file_handler.setFormatter(formatter)
@@ -53,9 +48,7 @@ class Runner(Thread):
             self.strip = Strip(strip_length)
         elif striptype == 'Arduino':
             self.strip = ArduinoStrip(
-                    x=3, 
-                    y=3,
-                    host="http://10.10.20.12/strip")
+                x=3, y=3, host="http://10.10.20.12/strip")
         else:
             self.strip = NoStrip(strip_length)
         LOG.debug("Initialized Daemon")
@@ -83,7 +76,8 @@ class Runner(Thread):
             self.data = self.data['strip']
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)
-            self.strip.brightness = int(self.data.get('brightness', self.strip.brightness))
+            self.strip.brightness = int(
+                self.data.get('brightness', self.strip.brightness))
             self.color_decode(self.data.get('color'))
         except ValueError:
             LOG.exception('Value Error : {}'.format(self.data))
@@ -112,7 +106,7 @@ class Runner(Thread):
             for cls in stripmodes.StripModes.__subclasses__():
                 if cls.MODE == self.strip_mode:
                     self.thread = cls(
-                            self.strip, self.stop_event, self.lock)
+                        self.strip, self.stop_event, self.lock)
                     self.thread.start()
                     break
         if self.strip_state == 'off':

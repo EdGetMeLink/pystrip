@@ -4,5 +4,6 @@ import logging
 
 LOG = logging.getLogger(__name__)
 
+
 def load_config():
-    return  Config('mds', 'pystrip')
+    return Config('mds', 'pystrip')
