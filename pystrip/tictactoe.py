@@ -10,8 +10,8 @@ import copy
 import time
 import random
 import logging
-from halloween.stripmodes import StripModes
-from halloween.colors import Color
+from pystrip.stripmodes import StripModes
+from pystrip.colors import Color
 
 LOG = logging.getLogger(__name__)
 

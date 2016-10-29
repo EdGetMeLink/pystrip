@@ -3,9 +3,9 @@ import json
 from queue import Queue
 import logging
 import logging.handlers
-from halloween.config import load_config
-from halloween.daemon import Runner
-import halloween.stripmodes as stripmodes
+from pystrip.config import load_config
+from pystrip.daemon import Runner
+import pystrip.stripmodes as stripmodes
 
 LOG = logging.getLogger(__name__)
 SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
@@ -16,7 +16,7 @@ def setup_logging():
     """
     setup logging for logger
     """
-    LOG_FILE = "halloween.log"
+    LOG_FILE = "pystrip.log"
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
@@ -47,7 +47,7 @@ def index():
     '''
     modes = [_.MODE for _ in stripmodes.StripModes.__subclasses__()]
     index = dict(
-        title="halloween backend",
+        title="pystrip backend",
         description="RESTful Halloween PI backend",
         version="0.0.1",
         _links={

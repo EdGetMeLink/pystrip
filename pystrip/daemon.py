@@ -1,7 +1,7 @@
 import logging
 import logging.handlers
 import random
-from halloween.colors import Color
+from pystrip.colors import Color
 import sys
 import time
 import json
@@ -10,8 +10,8 @@ from queue import Empty
 import random
 
 from threading import Thread, Event, Timer, Lock
-from halloween.strip import ArduinoStrip, NoStrip, Strip
-import halloween.stripmodes as stripmodes
+from pystrip.strip import ArduinoStrip, NoStrip, Strip
+import pystrip.stripmodes as stripmodes
 
 
 LOG = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ LOG = logging.getLogger(__name__)
 colors = Color()
 
 def setup_logging():
-    LOG_FILE = "halloween.log"
+    LOG_FILE = "pystrip.log"
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     formatter = (
