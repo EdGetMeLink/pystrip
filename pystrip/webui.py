@@ -1,11 +1,11 @@
-import argparse
 from flask import Flask, make_response, request
 import json
 from queue import Queue
 import logging
 import logging.handlers
-from halloween.daemon import Runner
-import halloween.stripmodes as stripmodes
+from pystrip.config import load_config
+from pystrip.daemon import Runner
+import pystrip.stripmodes as stripmodes
 
 LOG = logging.getLogger(__name__)
 SECRET_KEY = "jkdsfhkljhsfdlkjghdfkljhgkljshdfgkjshndkjlgh842u80awfiojkln"
@@ -16,7 +16,7 @@ def setup_logging():
     """
     setup logging for logger
     """
-    LOG_FILE = "halloween.log"
+    LOG_FILE = "pystrip.log"
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.DEBUG)
     formatter = logging.Formatter(
@@ -47,7 +47,7 @@ def index():
     '''
     modes = [_.MODE for _ in stripmodes.StripModes.__subclasses__()]
     index = dict(
-        title="halloween backend",
+        title="pystrip backend",
         description="RESTful Halloween PI backend",
         version="0.0.1",
         _links={
@@ -154,16 +154,12 @@ def stripcolor(colordata):
     return response
 
 
-def setup_parser():
-    parser = argparse.ArgumentParser(description="change default strip class")
-    parser.add_argument("--show", dest="show", action='store_true')
-    return parser
-
 if __name__ == "__main__":
     setup_logging()
-    parser = setup_parser()
-    args = parser.parse_args()
+    cfg = load_config()
+    striptype = cfg.get("general", "striptype")
+    striplenght = int(cfg.get("general", "striplenght"))
     app.queue = Queue()
-    app.runner = Runner(app.queue, 9, show=args.show)
+    app.runner = Runner(app.queue, striplenght, striptype)
 
     app.run(host="0.0.0.0", port=8081, debug=True)

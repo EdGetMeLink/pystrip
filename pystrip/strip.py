@@ -1,6 +1,6 @@
 import fcntl
 import array
-from halloween.colors import Color
+from pystrip.colors import Color
 import time
 import requests
 BLACK = Color().BLACK
