@@ -153,17 +153,15 @@ class Color():
     def random_color(ignore=None):
         colors = Color()
         crange = [
-                colors.AQUAMARINE,
-                colors.BROWN,
-                colors.CYAN,
-                colors.DARKVIOLET,
-                colors.RED,
-                colors.DARKGREEN,
-                colors.DARKBLUE,
-                colors.YELLOW]
+            colors.AQUAMARINE,
+            colors.BROWN,
+            colors.CYAN,
+            colors.DARKVIOLET,
+            colors.RED,
+            colors.DARKGREEN,
+            colors.DARKBLUE,
+            colors.YELLOW]
         if ignore in crange:
             crange.remove(ignore)
-        f = [val for attr, val in colors.__dict__.items()]
         random.seed()
         return random.choice(crange)
-
