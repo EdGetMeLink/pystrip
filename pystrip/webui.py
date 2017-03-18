@@ -35,6 +35,11 @@ def setup_logging():
 
 @app.before_first_request
 def daemon_starter():
+    cfg = load_config()
+    striptype = cfg.get("general", "striptype")
+    striplenght = int(cfg.get("general", "striplenght"))
+    app.queue = Queue()
+    app.runner = Runner(app.queue, striplenght, striptype)
     print("Starting Daemon")
     app.runner.start()
 
@@ -156,10 +161,10 @@ def stripcolor(colordata):
 
 if __name__ == "__main__":
     setup_logging()
-    cfg = load_config()
-    striptype = cfg.get("general", "striptype")
-    striplenght = int(cfg.get("general", "striplenght"))
-    app.queue = Queue()
-    app.runner = Runner(app.queue, striplenght, striptype)
+    #cfg = load_config()
+    #striptype = cfg.get("general", "striptype")
+    #striplenght = int(cfg.get("general", "striplenght"))
+    #app.queue = Queue()
+    #app.runner = Runner(app.queue, striplenght, striptype)
 
     app.run(host="0.0.0.0", port=8081, debug=True)
