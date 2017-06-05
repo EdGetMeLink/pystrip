@@ -3,7 +3,7 @@ import random
 import logging
 import math
 from threading import Thread
-from colors import Color
+from pystrip.colors import Color
 
 LOG = logging.getLogger(__name__)
 
