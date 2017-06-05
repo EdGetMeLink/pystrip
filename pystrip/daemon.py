@@ -66,6 +66,14 @@ class Runner(Thread):
         except:
             LOG.exception('Exception : ')
 
+    def _stop_thread(self):
+        if self.thread and self.thread.is_alive():
+            LOG.debug("Waiting for thread to stop (none mode)")
+            self.thread.join()
+            LOG.debug("Thread stopped")
+            self.stop_event.clear()
+
+
     def execute(self):
         """
         execute thread according to strip mode and state
@@ -74,29 +82,17 @@ class Runner(Thread):
             LOG.debug("strip_mode off")
             self.strip.all_off()
             self.stop_event.set()
-            if self.thread and self.thread.is_alive():
-                LOG.debug("Waiting for thread to stop (none mode)")
-                self.thread.join()
-                LOG.debug("Thread stopped")
+            self._stop_thread()
+
         if self.strip_state == 'on':
             self.stop_event.set()
-            if self.thread and self.thread.is_alive():
-                LOG.debug("Waiting for old thread to stop")
-                self.thread.join()
-                LOG.debug("Thread stopped")
-            self.stop_event.clear()
+            self._stop_thread()
             for cls in stripmodes.StripModes.__subclasses__():
                 if cls.MODE == self.strip_mode:
                     self.thread = cls(
                         self.strip, self.stop_event, self.lock)
                     self.thread.start()
                     break
-        if self.strip_state == 'off':
-            self.stop_event.set()
-            if self.thread and self.thread.is_alive():
-                LOG.debug("Waiting for thread to stop (received off)")
-                self.thread.join()
-                LOG.debug("Thread stopped")
 
     def color_decode(self, colordata):
         """
