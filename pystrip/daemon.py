@@ -71,7 +71,7 @@ class Runner(Thread):
             LOG.debug("Waiting for thread to stop (none mode)")
             self.thread.join()
             LOG.debug("Thread stopped")
-            self.stop_event.clear()
+        self.stop_event.clear()
 
 
     def execute(self):
