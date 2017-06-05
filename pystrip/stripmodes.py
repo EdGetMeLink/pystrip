@@ -338,14 +338,18 @@ class Game(StripModes):
         super(Game, self).__init__(strip, stop, lock)
 
 
-class Rainy(StripModes):
-    '''
-    Weather class for rainy days
-    '''
-    MODE = 'rainy'
+def hls_to_bytearray(h, l, s):
+    hsl = colorsys.hls_to_rgb(h/360, l, s)
+    r, g, b = (int(hsl[0] * 255), int(hsl[1] * 255), int(hsl[2] * 255))
+    color = [r, g, b]
+    return bytearray(color)
 
-    def run(self):
-        first = random.range(1, 10)
+def color_fade(h ,l ,s):
+    up_range = list(range(int(l*100), 75))
+    down_range = reversed(up_range)
+    up_range.extend(down_range)
+    for i in up_range:
+        yield hls_to_bytearray(h, i/100, s)
 
 class Clear(StripModes):
     '''
@@ -353,26 +357,13 @@ class Clear(StripModes):
     '''
     MODE = 'Clear'
 
-    def _hls_to_bytearray(self, h, l, s):
-        hsl = colorsys.hls_to_rgb(h/360, l, s)
-        r, g, b = (int(hsl[0] * 255), int(hsl[1] * 255), int(hsl[2] * 255))
-        color = [r, g, b]
-        return bytearray(color)
-
-    def _led_color(self, h ,l ,s):
-        up_range = list(range(int(l*100), 85))
-        down_range = reversed(up_range)
-        up_range.extend(down_range)
-        for i in up_range:
-            yield self._hls_to_bytearray(h, i/100, s)
-
     def run(self):
         LOG.debug("Clear Weather Conditions started")
         strip_range = range(self.strip.length)
         while not self.stop.is_set():
-            color = self._led_color(60, 0.5, 1)
+            color = color_fade(60, 0.5, 1)   # yellow
             for led in strip_range:
-                self.strip.set_pixel(led, self._hls_to_bytearray(60, 0.5, 1))
+                self.strip.set_pixel(led, hls_to_bytearray(60, 0.5, 1))
             leds = random.sample(strip_range, 3)
             try:
                 for c in color:
@@ -385,4 +376,29 @@ class Clear(StripModes):
         LOG.debug("Stopped Clear Weather Conditions")
         self.strip.all_off()
 
+
+class Rainy(StripModes):
+    '''
+    Weather class for rainy days
+    '''
+    MODE = 'rainy'
+
+    def run(self):
+        LOG.debug("Rany  Weather Conditions started")
+        strip_range = range(self.strip.length)
+        while not self.stop.is_set():
+            color = color_fade(240, 0.3, 1)   # Dark Blueich
+            for led in strip_range:
+                self.strip.set_pixel(led, hls_to_bytearray(240, 0.3, 1))
+            leds = random.sample(strip_range, 3)
+            try:
+                for c in color:
+                    for led in leds:
+                        self.strip.set_pixel(led, c)
+                    self.strip.show()
+            except StopIteration:
+                pass
+
+        LOG.debug("Stopped Rainy  Weather Conditions")
+        self.strip.all_off()
 
