@@ -344,8 +344,9 @@ def hls_to_bytearray(h, l, s):
     color = [r, g, b]
     return bytearray(color)
 
-def color_fade(h ,l ,s):
-    up_range = list(range(int(l*100), 75))
+def color_cycle(h ,l ,s):
+    # TODO : check if 70 > l*100 
+    up_range = list(range(int(l*100), 70))
     down_range = reversed(up_range)
     up_range.extend(down_range)
     for i in up_range:
@@ -361,7 +362,7 @@ class Clear(StripModes):
         LOG.debug("Clear Weather Conditions started")
         strip_range = range(self.strip.length)
         while not self.stop.is_set():
-            color = color_fade(60, 0.5, 1)   # yellow
+            color = color_cycle(60, 0.5, 1)   # yellow
             for led in strip_range:
                 self.strip.set_pixel(led, hls_to_bytearray(60, 0.5, 1))
             leds = random.sample(strip_range, 3)
@@ -387,7 +388,7 @@ class Rainy(StripModes):
         LOG.debug("Rany  Weather Conditions started")
         strip_range = range(self.strip.length)
         while not self.stop.is_set():
-            color = color_fade(240, 0.3, 1)   # Dark Blueich
+            color = color_cycle(240, 0.3, 1)   # Dark Blueich
             for led in strip_range:
                 self.strip.set_pixel(led, hls_to_bytearray(240, 0.3, 1))
             leds = random.sample(strip_range, 3)
@@ -402,3 +403,43 @@ class Rainy(StripModes):
         LOG.debug("Stopped Rainy  Weather Conditions")
         self.strip.all_off()
 
+
+class Drops(StripModes):
+    '''
+    Teardrops mode
+    '''
+    MODE = 'Teardrops'
+
+    def run(self):
+        LOG.debug("Teardrops started.")
+        '''
+        2 3 8
+        1 4 7
+        0 5 6
+        '''
+        drops = {
+            1: [2, 1, 0],
+            2: [3, 4, 5],
+            3: [8, 7, 6]
+            }
+        strip_range = range(self.strip.length)
+        while not self.stop.is_set():
+            for led in strip_range:
+                self.strip.set_pixel(led, hls_to_bytearray(241, 0.5, 1))
+            #for drop in range(1, 4):
+            drop = random.choice(range(1, 4))
+            for pixel in drops[drop]:
+
+                self.strip.set_pixel(pixel, hls_to_bytearray(241,0.59,1))
+                self.strip.show()
+                self.strip.set_pixel(pixel, hls_to_bytearray(241,0.5,1))
+                #drop1_color = color_cycle(241, 0.5 ,1)  # blue
+                #try:
+                #    for color in drop1_color:
+                #        self.strip.set_pixel(pixel, color)
+                #        self.strip.show()
+                #except StopIteration:
+                #    pass
+
+        LOG.debug("Stopped Teardrops")
+        self.strip.all_off()
