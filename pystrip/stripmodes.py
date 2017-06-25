@@ -418,6 +418,17 @@ class Drops(StripModes):
         1 4 7
         0 5 6
         '''
+        if 'speed' in self.params:
+            speed = int(self.params['speed'])
+        else:
+            speed = None
+        if 'hue' in self.params:
+            hue = int(self.params['hue'])
+            color = hls_to_bytearray(int(self.params['hue']), 0.5, 1)
+        else:
+            hue = 241
+            color = hls_to_bytearray(241, 0.5, 1)
+
         drops = {
             1: [2, 1, 0],
             2: [3, 4, 5],
@@ -426,21 +437,16 @@ class Drops(StripModes):
         strip_range = range(self.strip.length)
         while not self.stop.is_set():
             for led in strip_range:
-                self.strip.set_pixel(led, hls_to_bytearray(241, 0.5, 1))
+                self.strip.set_pixel(led, color)
             #for drop in range(1, 4):
             drop = random.choice(range(1, 4))
             for pixel in drops[drop]:
-
-                self.strip.set_pixel(pixel, hls_to_bytearray(241,0.59,1))
+                self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.59, 1))
                 self.strip.show()
-                self.strip.set_pixel(pixel, hls_to_bytearray(241,0.5,1))
-                #drop1_color = color_cycle(241, 0.5 ,1)  # blue
-                #try:
-                #    for color in drop1_color:
-                #        self.strip.set_pixel(pixel, color)
-                #        self.strip.show()
-                #except StopIteration:
-                #    pass
+                self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.5, 1))
+            self.strip.show()
+            if speed:
+                time.sleep(speed * 0.01)
 
         LOG.debug("Stopped Teardrops")
         self.strip.all_off()
