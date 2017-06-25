@@ -15,13 +15,14 @@ def rand_sleep(max_sleep=3):
 
 class StripModes(Thread):
 
-    def __init__(self, strip, stop, lock):
+    def __init__(self, strip, stop, lock, params):
         super(StripModes, self).__init__()
         self.daemon = True
         self.strip = strip
         self.stop = stop
         self.lock = lock
         self.name = 'StripMode'
+        self.params = params
 
 
 class OneColor(StripModes):

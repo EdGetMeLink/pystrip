@@ -55,6 +55,7 @@ class Runner(Thread):
         """
         try:
             self.data = json.loads(self.data)
+            self.params = json.loads(self.data.get('params', None))
             self.data = self.data['strip']
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)
@@ -90,7 +91,10 @@ class Runner(Thread):
             for cls in stripmodes.StripModes.__subclasses__():
                 if cls.MODE == self.strip_mode:
                     self.thread = cls(
-                        self.strip, self.stop_event, self.lock)
+                        self.strip,
+                        self.stop_event,
+                        self.lock,
+                        self.params)
                     self.thread.start()
                     break
 

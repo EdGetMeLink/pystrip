@@ -1,4 +1,4 @@
-from flask import Flask, make_response
+from flask import Flask, make_response, request
 import json
 from queue import Queue
 import logging
@@ -124,11 +124,19 @@ def stripmode(mode):
     set the stripmode
     :type mode: ony valid strip mode  (class) defined in daemon
     """
+    #params = request.args.get('params', None)
+    if request.args:
+        params = json.dumps(request.args)
+    else:
+        params = None
+
     data = {
         'strip': {
             'mode': mode
-        }
+        },
+        'params': params
     }
+    LOG.debug(data)
     app.queue.put(json.dumps(data))
     response = make_response(json.dumps(data), 200)
     response.headers['Content-Type'] = 'application/json'
