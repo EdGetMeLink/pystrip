@@ -1,3 +1,7 @@
 [general]
 striplenght=20
 striptype=None
+[drops]
+1: [2, 1, 0]
+2: [3, 4, 5]
+3: [8, 7, 6]

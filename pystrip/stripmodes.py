@@ -420,6 +420,7 @@ class Drops(StripModes):
         1 4 7
         0 5 6
         '''
+        cfg = load_config()
         if 'speed' in self.params:
             speed = int(self.params['speed'])
         else:
@@ -430,19 +431,19 @@ class Drops(StripModes):
         else:
             hue = 241
             color = hls_to_bytearray(241, 0.5, 1)
-
-        drops = {
-            1: [2, 1, 0],
-            2: [3, 4, 5],
-            3: [8, 7, 6]
-            }
+        drops = {}
+        for option in cfg.options("drops"):
+            drops[option] = json.loads(cfg.get("drops", option))
+            LOG.debug(option)
+            LOG.debug(type(drops[option]))
+        LOG.debug(drops)
         strip_range = range(self.strip.length)
         while not self.stop.is_set():
+            time.sleep(1)
             for led in strip_range:
                 self.strip.set_pixel(led, color)
-            #for drop in range(1, 4):
-            drop = random.choice(range(1, 4))
-            for pixel in drops[drop]:
+            drop = random.choice(range(1, len(drops) + 1))
+            for pixel in drops[str(drop)]:
                 self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.59, 1))
                 self.strip.show()
                 self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.5, 1))
