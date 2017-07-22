@@ -1,10 +1,12 @@
 from threading import Thread
 import colorsys
+import json
 import logging
 import math
 import random
 import time
 from pystrip.colors import Color
+from pystrip.config import load_config
 
 LOG = logging.getLogger(__name__)
 

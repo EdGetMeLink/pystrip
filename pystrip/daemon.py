@@ -5,7 +5,7 @@ import json
 
 
 from threading import Thread, Event, Lock
-from pystrip.strip import ArduinoStrip, NoStrip, Strip
+from pystrip.strip import ArduinoStrip, NoStrip, Strip, ColorStrip
 import pystrip.stripmodes as stripmodes
 
 
@@ -31,6 +31,8 @@ class Runner(Thread):
         elif striptype == 'Arduino':
             self.strip = ArduinoStrip(
                 x=3, y=3, host="http://10.10.20.12/strip")
+        elif striptype == 'ColorStrip':
+            self.strip = ColorStrip(x=3, y=3)
         else:
             self.strip = NoStrip(strip_length)
         LOG.debug("Initialized Daemon")
@@ -55,7 +57,9 @@ class Runner(Thread):
         """
         try:
             self.data = json.loads(self.data)
-            self.params = json.loads(self.data.get('params', None))
+            params = self.data.get('params', None)
+            if params:
+                self.params = json.loads(params)
             self.data = self.data['strip']
             self.strip_state = self.data.get('state', self.strip_state)
             self.strip_mode = self.data.get('mode', self.strip_mode)

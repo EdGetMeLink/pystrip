@@ -3,6 +3,8 @@ import array
 from pystrip.colors import Color
 import time
 import requests
+import pystrip.helpers
+
 BLACK = Color().BLACK
 
 
@@ -155,6 +157,44 @@ class NoStrip(Strip):
             print(pixel.x, pixel.y, 0, 0, 0)
         print("-" * 80)
 
+class ColorStrip(Strip):
+    """
+    this class only prints the strip to stdout with colors
+    """
+    def __init__(self, x=3, y=3):
+        self.pixels = []
+        self.brightness = 100
+        self.length = x * y
+        for pixx in range(x):
+            if pixx % 2 == 0:
+                for pixy in range(y):
+                    pixel = Pixel(pixx, pixy)
+                    self.pixels.append(pixel)
+            else:
+                for pixy in reversed(range(y)):
+                    pixel = Pixel(pixx, pixy)
+                    self.pixels.append(pixel)
+
+    def show(self):
+        pystrip.helpers.clear_screen()
+        pystrip.helpers.print_at_position(10,10, "{:^3}|{:^3}|{:^5}|{:^5}|{:^5}".format(
+            "x", "y", "red", "green", "blue"))
+        for idx, pixel in enumerate(self.pixels):
+            pystrip.helpers.set_color(fg=pystrip.helpers.rgb_ansi16(pixel.red, pixel.green, pixel.blue))
+            pystrip.helpers.print_at_position(10, 11+idx, "{:^3}|{:^3}|{:^5}|{:^5}|{:^5}".format(
+                pixel.x,
+                pixel.y,
+                pixel.red,
+                pixel.green,
+                pixel.blue)
+            )
+            pystrip.helpers.reset_color()
+
+    def all_off(self):
+        pystrip.helpers.clear_screen()
+        pystrip.helpers.print_at_position(10,10, "{:^3}|{:^3}|{:^5}|{:^5}|{:^5}".format(
+            "x", "y", "red", "green", "blue"))
+    pass
 
 class Pixel(object):
 
