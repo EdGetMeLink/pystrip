@@ -348,7 +348,7 @@ def hls_to_bytearray(h, l, s):
     return bytearray(color)
 
 def color_cycle(h ,l ,s):
-    # TODO : check if 70 > l*100 
+    # TODO : check if 70 > l*100
     up_range = list(range(int(l*100), 70))
     down_range = reversed(up_range)
     up_range.extend(down_range)
@@ -452,4 +452,82 @@ class Drops(StripModes):
                 time.sleep(speed * 0.01)
 
         LOG.debug("Stopped Teardrops")
+        self.strip.all_off()
+
+
+class PartlyCloudy(StripModes):
+    '''
+    PartlyCloudy mode
+    '''
+    MODE = 'PartlyCloudy'
+
+    def __init__(self):
+        super(StripModes).__init__()
+        self.matrix = {
+                    0: [9,9,9,9,9],
+                    1: [9,2,3,8,9],
+                    2: [9,1,4,7,9],
+                    3: [9,0,5,6,9],
+                    4: [9,9,9,9,9]
+                    }
+
+    def cloud(self, x, y):
+        '''
+        0 1 2 3 4  x
+        0 9 9 9 9
+        1 2 3 8 9
+        2 1 4 7 9
+        3 0 5 6 9
+        4 9 9 9 9
+        y
+
+        s  = 4   x = 1 y = 1
+        ls = 1   x - 1 y
+        rs = 7   x + 1 y
+        ts = 3   x     y - 1
+        bs = 5   x     y + 1
+        '''
+        s = self.matrix[x][y]
+        rs = self.matrix[x+1][y]
+        ls = self.matrix[x-1][y]
+        ts = self.matrix[x][y-1]
+        bs = self.matrix[x][y+1]
+        return [s, rs, ls, ts, bs]
+
+    def run(self):
+        LOG.debug("PartlyCloudy started.")
+
+        cfg = load_config()
+        if 'speed' in self.params:
+            speed = int(self.params['speed'])
+        else:
+            speed = None
+        if 'hue' in self.params:
+            hue = int(self.params['hue'])
+            color = hls_to_bytearray(int(self.params['hue']), 0.5, 1)
+        else:
+            hue = 241
+            color = hls_to_bytearray(241, 0.5, 1)
+
+        strip_range = range(self.strip.length)
+        while not self.stop.is_set():
+            time.sleep(1)
+            for led in strip_range:
+                self.strip.set_pixel(led, color)
+            cloudx = random.randomint(0, 4)
+            cloudy = random.randomint(0, 4)
+
+            for x in self.matrix[cloudx]:
+                for pixel in self.cloud(cloudx, cloudy):
+                    if pixel < 9:
+                        self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.59, 1))
+                self.strip.show()
+                for pixel in self.cloud(cloudx, cloudy):
+                    if pixel < 9:
+                        self.strip.set_pixel(pixel, hls_to_bytearray(hue, 0.5, 1))
+                self.strip.show()
+                if speed:
+                    time.sleep(speed * 0.01)
+
+        LOG.debug("Stopped PartlyCloudy")
         self.strip.all_off()

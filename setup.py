@@ -12,11 +12,16 @@ setup(
     url='www.deltgen.net',
     include_package_data=True,
     license="Private",
+    dependency_links=[
+        'git+https://gitlab.deltgen.net/mdeltgen/wunderscrap.git#egg==wunderscrap-0.0.1'
+    ],
     install_requires=[
         'Flask',
         'requests',
         'config-resolver',
+        'wundersrcap',
     ],
+
     packages=find_packages(exclude=["tests.*", "tests"]),
     zip_safe=False,
 )
